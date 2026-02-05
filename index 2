@@ -1,1 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecommerce Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --primary-dark: #4338ca;
+            --secondary: #10b981;
+            --secondary-light: #34d399;
+            --secondary-dark: #059669;
+        }
 
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #f5f5f5;
+            --card-bg: #2d2d2d;
+            --border-color: #444;
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f9fafb;
+            --text-color: #111827;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .kpi-card {
+            min-height: 120px;
+        }
+
+        .kpi-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+
+        .kpi-label {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        .kpi-change {
+            font-size: 0.75rem;
+        }
+
+        .positive {
+            color: var(--secondary);
+        }
+
+        .negative {
+            color: #ef4444;
+        }
+
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            position: sticky;
+            top: 0;
+            background-color: var(--card-bg);
+            z-index: 10;
+        }
+
+        .sortable:hover {
+            cursor: pointer;
+            background-color: rgba(79, 70, 229, 0.1);
+        }
+
+        .sort-icon {
+            margin-left: 0.25rem;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased" data-theme="light">
+    <div class="loading-overlay hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                    <i data-feather="trending-up" class="text-indigo-600"></i>
+                </div>
+                <h1 class="text-2xl font-bold">Ecommerce Dashboard</h1>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                <div class="flex items-center gap-2">
+                    <label for="date-range" class="text-sm font-medium">Month Range:</label>
+<select id="date-range" class="rounded-md border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="3">Last 3 Months</option>
+                        <option value="6" selected>Last 6 Months</option>
+                        <option value="12">Last 12 Months</option>
+                        <option value="ytd">Year to Date</option>
+                        <option value="custom">Custom</option>
+</select>
+                </div>
+
+                <div id="custom-date-range" class="hidden flex-col md:flex-row gap-2">
+                <div class="flex items-center gap-2">
+                    <label for="start-month" class="text-sm font-medium">From:</label>
+                    <input type="month" id="start-month" class="rounded-md border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div class="flex items-center gap-2">
+                    <label for="end-month" class="text-sm font-medium">To:</label>
+                    <input type="month" id="end-month" class="rounded-md border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+</div>
+
+                <div class="flex items-center gap-2">
+                    <label for="source-filter" class="text-sm font-medium">Source:</label>
+                    <select id="source-filter" class="rounded-md border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="all">All Sources</option>
+                        <option value="google">Google Ads</option>
+                        <option value="meta">Meta Ads</option>
+                        <option value="shopify">Shopify</option>
+                    </select>
+                </div>
+
+                <button id="theme-toggle" class="ml-auto md:ml-0 px-3 py-2 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-100">
+                    <i data-feather="moon" class="hidden dark:block"></i>
+                    <i data-feather="sun" class="dark:hidden"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
+            <div class="card rounded-lg shadow p-4 kpi-card">
+                <div class="kpi-label">Total Revenue</div>
+                <div class="kpi-value" id="total-revenue">$0</div>
+                <div class="kpi-change flex items-center">
+                    <span id="revenue-change">0%</span>
+                    <i data-feather="arrow-up" class="positive hidden ml-1" id="revenue-up"></i>
+                    <i data-feather="arrow-down" class="negative hidden ml-1" id="revenue-down"></i>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow p-4 kpi-card">
+                <div class="kpi-label">Total Spend</div>
+                <div class="kpi-value" id="total-spend">$0</div>
+                <div class="kpi-change flex items-center">
+                    <span id="spend-change">0%</span>
+                    <i data-feather="arrow-up" class="positive hidden ml-1" id="spend-up"></i>
+                    <i data-feather="arrow-down" class="negative hidden ml-1" id="spend-down"></i>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow p-4 kpi-card">
+                <div class="kpi-label">Total Orders</div>
+                <div class="kpi-value" id="total-orders">0</div>
+                <div class="kpi-change flex items-center">
+                    <span id="orders-change">0%</span>
+                    <i data-feather="arrow-up" class="positive hidden ml-1" id="orders-up"></i>
+                    <i data-feather="arrow-down" class="negative hidden ml-1" id="orders-down"></i>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow p-4 kpi-card">
+                <div class="kpi-label">ROAS</div>
+                <div class="kpi-value" id="roas">0.00</div>
+                <div class="kpi-change flex items-center">
+                    <span id="roas-change">0%</span>
+                    <i data-feather="arrow-up" class="positive hidden ml-1" id="roas-up"></i>
+                    <i data-feather="arrow-down" class="negative hidden ml-1" id="roas-down"></i>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow p-4 kpi-card">
+                <div class="kpi-label">AOV</div>
+                <div class="kpi-value" id="aov">$0</div>
+                <div class="kpi-change flex items-center">
+                    <span id="aov-change">0%</span>
+                    <i data-feather="arrow-up" class="positive hidden ml-1" id="aov-up"></i>
+                    <i data-feather="arrow-down" class="negative hidden ml-1" id="aov-down"></i>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow p-4 kpi-card">
+                <div class="kpi-label">CAC</div>
+                <div class="kpi-value" id="cac">$0</div>
+                <div class="kpi-change flex items-center">
+                    <span id="cac-change">0%</span>
+                    <i data-feather="arrow-up" class="positive hidden ml-1" id="cac-up"></i>
+                    <i data-feather="arrow-down" class="negative hidden ml-1" id="cac-down"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="card rounded-lg shadow p-4">
+                <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Revenue by Month</h2>
+<div class="flex items-center gap-2">
+                        <button id="toggle-revenue-stack" class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700">Toggle Stack</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="revenue-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow p-4">
+                <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Spend by Month</h2>
+</div>
+                <div class="chart-container">
+                    <canvas id="spend-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow p-4">
+                <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Orders by Month</h2>
+<div class="flex items-center gap-2">
+                        <button id="toggle-orders-stack" class="text-xs px-2 py-1 rounded bg-gray-100 dark:bg-gray-700">Toggle Stack</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="orders-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow p-4">
+                <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">ROAS by Month</h2>
+</div>
+                <div class="chart-container">
+                    <canvas id="roas-chart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="card rounded-lg shadow p-4 mb-8">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold">Detailed Performance</h2>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="table-search" placeholder="Search..." class="rounded-md border border-gray-300 bg-white dark:bg-gray-700 dark:border-gray-600 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="performance-table" class="w-full">
+                    <thead>
+                        <tr>
+                    <th class="sortable" data-sort="date">Month <i data-feather="chevron-down" class="sort-icon"></i></th>
+<th class="sortable" data-sort="source">Source <i data-feather="chevron-down" class="sort-icon"></i></th>
+                            <th class="sortable text-right" data-sort="spend">Spend <i data-feather="chevron-down" class="sort-icon"></i></th>
+                            <th class="sortable text-right" data-sort="revenue">Revenue <i data-feather="chevron-down" class="sort-icon"></i></th>
+                            <th class="sortable text-right" data-sort="orders">Orders <i data-feather="chevron-down" class="sort-icon"></i></th>
+                            <th class="sortable text-right" data-sort="roas">ROAS <i data-feather="chevron-down" class="sort-icon"></i></th>
+                            <th class="sortable text-right" data-sort="aov">AOV <i data-feather="chevron-down" class="sort-icon"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Data will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="card rounded-lg shadow p-4">
+                <h2 class="text-lg font-semibold mb-4">Performance by Source</h2>
+                <div class="chart-container">
+                    <canvas id="source-pie-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow p-4">
+                <h2 class="text-lg font-semibold mb-4">Monthly Trends</h2>
+                <div class="chart-container">
+                    <canvas id="monthly-trends-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="card rounded-lg shadow p-4">
+                <h2 class="text-lg font-semibold mb-4">Efficiency Metrics</h2>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">ROAS</span>
+                            <span class="text-sm" id="avg-roas">0.00</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                            <div class="bg-indigo-600 h-2.5 rounded-full" id="roas-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">AOV</span>
+                            <span class="text-sm" id="avg-aov">$0.00</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                            <div class="bg-green-500 h-2.5 rounded-full" id="aov-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-sm font-medium">CAC</span>
+                            <span class="text-sm" id="avg-cac">$0.00</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                            <div class="bg-blue-500 h-2.5 rounded-full" id="cac-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const SHEET_CSV_URL = "PASTE_HERE";
+        const DATE_FORMAT = { year: 'numeric', month: 'long' };
+// Global variables
+        let rawData = [];
+        let filteredData = [];
+        let currentSort = { column: 'date', direction: 'desc' };
+        let revenueChart, spendChart, ordersChart, roasChart, sourcePieChart, monthlyTrendsChart;
+        let isRevenueStacked = true;
+        let isOrdersStacked = true;
+
+        // DOM Elements
+        const loadingOverlay = document.querySelector('.loading-overlay');
+        const dateRangeSelect = document.getElementById('date-range');
+        const customDateRange = document.getElementById('custom-date-range');
+            const startMonthInput = document.getElementById('start-month');
+            const endMonthInput = document.getElementById('end-month');
+const sourceFilter = document.getElementById('source-filter');
+        const themeToggle = document.getElementById('theme-toggle');
+        const tableSearch = document.getElementById('table-search');
+        const tableBody = document.getElementById('table-body');
+        const toggleRevenueStack = document.getElementById('toggle-revenue-stack');
+        const toggleOrdersStack = document.getElementById('toggle-orders-stack');
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Initialize feather icons
+            feather.replace();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Load data
+            await loadData();
+            
+            // Initial render
+            applyFilters();
+        });
+
+        function setupEventListeners() {
+            // Date range selector
+            dateRangeSelect.addEventListener('change', function() {
+                if (this.value === 'custom') {
+                    customDateRange.classList.remove('hidden');
+            // Set default month range to last 6 full months
+            const now = new Date();
+            const end = new Date(now.getFullYear(), now.getMonth(), 1); // first of current month
+            const start = new Date(now.getFullYear(), now.getMonth() - 5, 1); // 6 months incl current
+            startMonthInput.value = `${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}`;
+            endMonthInput.value = `${end.getFullYear()}-${String(end.getMonth()+1).padStart(2,'0')}`;
+} else {
+                    customDateRange.classList.add('hidden');
+                }
+                applyFilters();
+            });
+            // Custom month inputs
+            startMonthInput.addEventListener('change', applyFilters);
+            endMonthInput.addEventListener('change', applyFilters);
+// Source filter
+            sourceFilter.addEventListener('change', applyFilters);
+
+            // Theme toggle
+            themeToggle.addEventListener('click', toggleTheme);
+
+            // Table search
+            tableSearch.addEventListener('input', applyFilters);
+
+            // Sortable table headers
+            document.querySelectorAll('.sortable').forEach(header => {
+                header.addEventListener('click', () => {
+                    const column = header.dataset.sort;
+                    if (currentSort.column === column) {
+                        currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        currentSort.column = column;
+                        currentSort.direction = 'asc';
+                    }
+                    applyFilters();
+                });
+            });
+
+            // Chart toggles
+            toggleRevenueStack.addEventListener('click', () => {
+                isRevenueStacked = !isRevenueStacked;
+                updateRevenueChart();
+            });
+
+            toggleOrdersStack.addEventListener('click', () => {
+                isOrdersStacked = !isOrdersStacked;
+                updateOrdersChart();
+            });
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.body.setAttribute('data-theme', newTheme);
+            
+            // Update charts for theme change
+            updateCharts();
+            
+            // Update feather icons
+            feather.replace();
+        }
+
+        async function loadData() {
+            try {
+                showLoading();
+                
+                if (!SHEET_CSV_URL || SHEET_CSV_URL === "PASTE_HERE") {
+                    throw new Error("Please set the SHEET_CSV_URL variable to your Google Sheet CSV export URL");
+                }
+                
+                const response = await fetch(SHEET_CSV_URL);
+                const csvData = await response.text();
+                rawData = parseCSV(csvData);
+                
+                // Process data
+                rawData.forEach(item => {
+                    item.date = new Date(item.date);
+                    item.spend = parseFloat(item.spend) || 0;
+                    item.revenue = parseFloat(item.revenue) || 0;
+                    item.orders = parseInt(item.orders) || 0;
+                    
+                    // Calculate derived metrics
+                    item.roas = item.spend > 0 ? item.revenue / item.spend : 0;
+                    item.aov = item.orders > 0 ? item.revenue / item.orders : 0;
+                });
+                
+                hideLoading();
+            } catch (error) {
+                hideLoading();
+                alert(`Error loading data: ${error.message}`);
+                console.error(error);
+            }
+        }
+
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            
+            return lines.slice(1).map(line => {
+                const values = line.split(',');
+                const row = {};
+                
+                headers.forEach((header, index) => {
+                    // Handle cases where the value might be wrapped in quotes
+                    let value = values[index] || '';
+                    if (value.startsWith('"') && value.endsWith('"')) {
+                        value = value.slice(1, -1);
+                    }
+                    row[header] = value.trim();
+                });
+                
+                return row;
+            }).filter(row => row.date); // Filter out empty rows
+        }
+
+        function applyFilters() {
+            if (rawData.length === 0) return;
+            
+            // Get filter values
+            const dateRange = dateRangeSelect.value;
+            const source = sourceFilter.value;
+            const searchTerm = tableSearch.value.toLowerCase();
+            
+            // Filter by date range
+            let startDate, endDate = new Date();
+            endDate.setHours(23, 59, 59, 999); // End of day
+            
+            if (dateRange === 'custom') {
+                startDate = new Date(startMonthInput.value + '-01');
+                endDate = new Date(endMonthInput.value + '-01');
+                // Set to last day of month
+                endDate.setMonth(endDate.getMonth() + 1);
+                endDate.setDate(0);
+                endDate.setHours(23, 59, 59, 999);
+} else if (dateRange === 'ytd') {
+                startDate = new Date(new Date().getFullYear(), 0, 1);
+            } else {
+                const months = parseInt(dateRange);
+                const now = new Date();
+                endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999); // last day of current month
+                startDate = new Date(now.getFullYear(), now.getMonth() - (months - 1), 1); // first day of earliest included month
+}
+            
+            // Filter data
+            filteredData = rawData.filter(item => {
+                // Date filter
+                if (item.date < startDate || item.date > endDate) return false;
+                
+                // Source filter
+                if (source !== 'all' && item.source !== source) return false;
+                
+                // Search filter
+                if (searchTerm && !(
+                    item.date.toLocaleDateString().toLowerCase().includes(searchTerm) ||
+                    item.source.toLowerCase().includes(searchTerm) ||
+                    item.spend.toString().includes(searchTerm) ||
+                    item.revenue.toString().includes(searchTerm) ||
+                    item.orders.toString().includes(searchTerm)
+                )) return false;
+                
+                return true;
+            });
+            
+            // Sort data
+            filteredData.sort((a, b) => {
+                let comparison = 0;
+                
+                if (currentSort.column === 'date') {
+                    comparison = a.date - b.date;
+                } else if (currentSort.column === 'source') {
+                    comparison = a.source.localeCompare(b.source);
+                } else {
+                    comparison = a[currentSort.column] - b[currentSort.column];
+                }
+                
+                return currentSort.direction === 'asc' ? comparison : -comparison;
+            });
+            
+            // Update UI
+            updateKPICards();
+            updateTable();
+            updateCharts();
+        }
+
+        function updateKPICards() {
+            if (filteredData.length === 0) {
+                // Reset all KPIs to 0
+                document.getElementById('total-revenue').textContent = '$0';
+                document.getElementById('total-spend').textContent = '$0';
+                document.getElementById('total-orders').textContent = '0';
+                document.getElementById('roas').textContent = '0.00';
+                document.getElementById('aov').textContent = '$0';
+                document.getElementById('cac').textContent = '$0';
+                
+                // Reset all change indicators
+                document.querySelectorAll('.kpi-change span').forEach(el => el.textContent = '0%');
+                document.querySelectorAll('.kpi-change i').forEach(el => el.classList.add('hidden'));
+                
+                return;
+            }
+            
+            // Calculate totals
+            const totalRevenue = filteredData.reduce((sum, item) => sum + item.revenue, 0);
+            const totalSpend = filteredData.reduce((sum, item) => sum + item.spend, 0);
+            const totalOrders = filteredData.reduce((sum, item) => sum + item.orders, 0);
+            
+            // Calculate metrics
+            const roas = totalSpend > 0 ? totalRevenue / totalSpend : 0;
+            const aov = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+            const cac = totalOrders > 0 ? totalSpend / totalOrders : 0;
+            
+            // Update KPI cards
+            document.getElementById('total-revenue').textContent = formatCurrency(totalRevenue);
+            document.getElementById('total-spend').textContent = formatCurrency(totalSpend);
+            document.getElementById('total-orders').textContent = totalOrders.toLocaleString();
+            document.getElementById('roas').textContent = roas.toFixed(2);
+            document.getElementById('aov').textContent = formatCurrency(aov);
+            document.getElementById('cac').textContent = formatCurrency(cac);
+            
+            // Calculate previous period for comparison
+            const dateRange = dateRangeSelect.value;
+            let comparisonStartDate, comparisonEndDate = new Date();
+            
+            if (dateRange === 'custom') {
+                const startDate = new Date(startDateInput.value);
+                const endDate = new Date(endDateInput.value);
+                    const durationMonths = (endDate.getFullYear() - startDate.getFullYear()) * 12 + endDate.getMonth() - startDate.getMonth();
+                
+                    comparisonEndDate = new Date(startDate);
+                    comparisonEndDate.setMonth(comparisonEndDate.getMonth() - 1);
+                    comparisonStartDate = new Date(comparisonEndDate);
+                    comparisonStartDate.setMonth(comparisonStartDate.getMonth() - durationMonths);
+} else if (dateRange === 'ytd') {
+                const currentYear = new Date().getFullYear();
+                comparisonStartDate = new Date(currentYear - 1, 0, 1);
+                comparisonEndDate = new Date(currentYear - 1, 11, 31);
+            } else {
+                const months = parseInt(dateRange);
+                comparisonEndDate = new Date();
+                comparisonEndDate.setMonth(comparisonEndDate.getMonth() - 1);
+                comparisonStartDate = new Date(comparisonEndDate);
+                comparisonStartDate.setMonth(comparisonStartDate.getMonth() - months);
+}
+            
+            // Get comparison data
+            const comparisonData = rawData.filter(item => 
+                item.date >= comparisonStartDate && item.date <= comparisonEndDate
+            );
+            
+            // Calculate comparison totals
+            const comparisonRevenue = comparisonData.reduce((sum, item) => sum + item.revenue, 0);
+            const comparisonSpend = comparisonData.reduce((sum, item) => sum + item.spend, 0);
+            const comparisonOrders = comparisonData.reduce((sum, item) => sum + item.orders, 0);
+            
+            // Calculate comparison metrics
+            const comparisonRoas = comparisonSpend > 0 ? comparisonRevenue / comparisonSpend : 0;
+            const comparisonAov = comparisonOrders > 0 ? comparisonRevenue / comparisonOrders : 0;
+            const comparisonCac = comparisonOrders > 0 ? comparisonSpend / comparisonOrders : 0;
+            
+            // Calculate percentage changes
+            const revenueChange = comparisonRevenue ? ((totalRevenue - comparisonRevenue) / comparisonRevenue) * 100 : 0;
+            const spendChange = comparisonSpend ? ((totalSpend - comparisonSpend) / comparisonSpend) * 100 : 0;
+            const ordersChange = comparisonOrders ? ((totalOrders - comparisonOrders) / comparisonOrders) * 100 : 0;
+            const roasChange = comparisonRoas ? ((roas - comparisonRoas) / comparisonRoas) * 100 : 0;
+            const aovChange = comparisonAov ? ((aov - comparisonAov) / comparisonAov) * 100 : 0;
+            const cacChange = comparisonCac ? ((cac - comparisonCac) / comparisonCac) * 100 : 0;
+            
+            // Update change indicators
+            updateChangeIndicator('revenue', revenueChange);
+            updateChangeIndicator('spend', spendChange);
+            updateChangeIndicator('orders', ordersChange);
+            updateChangeIndicator('roas', roasChange);
+            updateChangeIndicator('aov', aovChange);
+            updateChangeIndicator('cac', cacChange);
+            
+            // Update summary metrics
+            document.getElementById('avg-roas').textContent = roas.toFixed(2);
+            document.getElementById('avg-aov').textContent = formatCurrency(aov);
+            document.getElementById('avg-cac').textContent = formatCurrency(cac);
+            
+            // Update progress bars (normalized to show relative performance)
+            const maxRoas = Math.max(roas, comparisonRoas, 5); // Cap at 5x ROAS for visualization
+            const maxAov = Math.max(aov, comparisonAov, 200); // Cap at $200 AOV for visualization
+            const maxCac = Math.max(cac, comparisonCac, 50); // Cap at $50 CAC for visualization
+            
+            document.getElementById('roas-bar').style.width = `${(roas / maxRoas) * 100}%`;
+            document.getElementById('aov-bar').style.width = `${(aov / maxAov) * 100}%`;
+            document.getElementById('cac-bar').style.width = `${(cac / maxCac) * 100}%`;
+        }
+
+        function updateChangeIndicator(metric, change) {
+            const changeElement = document.getElementById(`${metric}-change`);
+            const upArrow = document.getElementById(`${metric}-up`);
+            const downArrow = document.getElementById(`${metric}-down`);
+            
+            changeElement.textContent = `${Math.abs(change).toFixed(1)}%`;
+            
+            if (change > 0) {
+                changeElement.classList.add('positive');
+                changeElement.classList.remove('negative');
+                upArrow.classList.remove('hidden');
+                downArrow.classList.add('hidden');
+            } else if (change < 0) {
+                changeElement.classList.add('negative');
+                changeElement.classList.remove('positive');
+                upArrow.classList.add('hidden');
+                downArrow.classList.remove('hidden');
+            } else {
+                changeElement.classList.remove('positive', 'negative');
+                upArrow.classList.add('hidden');
+                downArrow.classList.add('hidden');
+            }
+        }
+
+        function updateTable() {
+            tableBody.innerHTML = '';
+            
+            if (filteredData.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="7" class="text-center py-4">No data available for the selected filters</td>';
+                tableBody.appendChild(row);
+                return;
+            }
+            
+            filteredData.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700';
+                
+                row.innerHTML = `
+                    <td>${item.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}</td>
+<td class="capitalize">${item.source}</td>
+                    <td class="text-right">${formatCurrency(item.spend)}</td>
+                    <td class="text-right">${formatCurrency(item.revenue)}</td>
+                    <td class="text-right">${item.orders}</td>
+                    <td class="text-right">${item.roas.toFixed(2)}</td>
+                    <td class="text-right">${formatCurrency(item.aov)}</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        function updateCharts() {
+            if (filteredData.length === 0) {
+                // Clear all charts if no data
+                if (revenueChart) revenueChart.destroy();
+                if (spendChart) spendChart.destroy();
+                if (ordersChart) ordersChart.destroy();
+                if (roasChart) roasChart.destroy();
+                if (sourcePieChart) sourcePieChart.destroy();
+                if (monthlyTrendsChart) monthlyTrendsChart.destroy();
+                
+                return;
+            }
+            // Group data by month and source for charts
+                const months = [...new Set(filteredData.map(item => 
+                    `${item.date.getFullYear()}-${String(item.date.getMonth() + 1).padStart(2, '0')}`
+                ))].sort();
+                
+                const googleData = {};
+                const metaData = {};
+                const shopifyData = {};
+                
+                months.forEach(month => {
+                    googleData[month] = { revenue: 0, spend: 0, orders: 0 };
+                    metaData[month] = { revenue: 0, spend: 0, orders: 0 };
+                    shopifyData[month] = { revenue: 0, spend: 0, orders: 0 };
+                });
+                
+                filteredData.forEach(item => {
+                    const monthKey = `${item.date.getFullYear()}-${String(item.date.getMonth() + 1).padStart(2, '0')}`;
+if (item.source === 'google') {
+                    googleData[dateKey].revenue += item.revenue;
+                    googleData[dateKey].spend += item.spend;
+                    googleData[dateKey].orders += item.orders;
+                } else if (item.source === 'meta') {
+                    metaData[dateKey].revenue += item.revenue;
+                    metaData[dateKey].spend += item.spend;
+                    metaData[dateKey].orders += item.orders;
+                } else if (item.source === 'shopify') {
+                    shopifyData[dateKey].revenue += item.revenue;
+                    shopifyData[dateKey].spend += item.spend;
+                    shopifyData[dateKey].orders += item.orders;
+                }
+            });
+            
+            // Prepare chart data
+            const formattedMonths = months.map(month => {
+                const [year, monthNum] = month.split('-');
+                return new Date(year, monthNum - 1).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+            });
+            const googleRevenue = months.map(month => googleData[month].revenue);
+            const metaRevenue = months.map(month => metaData[month].revenue);
+            const shopifyRevenue = months.map(month => shopifyData[month].revenue);
+            
+            const googleSpend = months.map(month => googleData[month].spend);
+            const metaSpend = months.map(month => metaData[month].spend);
+            
+            const googleOrders = months.map(month => googleData[month].orders);
+            const metaOrders = months.map(month => metaData[month].orders);
+            const shopifyOrders = months.map(month => shopifyData[month].orders);
+            
+            const googleRoas = months.map(month => googleData[month].spend > 0 ? googleData[month].revenue / googleData[month].spend : 0);
+            const metaRoas = months.map(month => metaData[month].spend > 0 ? metaData[month].revenue / metaData[month].spend : 0);
+// Update or create charts
+            updateRevenueChart();
+            updateSpendChart();
+            updateOrdersChart();
+            updateRoasChart();
+            updateSourcePieChart();
+            updateMonthlyTrendsChart();
+            
+            function updateRevenueChart() {
+                const ctx = document.getElementById('revenue-chart').getContext('2d');
+                
+                if (revenueChart) revenueChart.destroy();
+                
+                revenueChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                    labels: formattedMonths,
+datasets: [
+                            {
+                                label: 'Google Revenue',
+                                data: googleRevenue,
+                                borderColor: '#4f46e5',
+                                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                                tension: 0.3,
+                                fill: isRevenueStacked ? 'origin' : false
+                            },
+                            {
+                                label: 'Meta Revenue',
+                                data: metaRevenue,
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.3,
+                                fill: isRevenueStacked ? 'origin' : false
+                            },
+                            {
+                                label: 'Shopify Revenue',
+                                data: shopifyRevenue,
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                tension: 0.3,
+                                fill: isRevenueStacked ? 'origin' : false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${formatCurrency(context.raw)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--border-color')
+                                },
+                                ticks: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--border-color')
+                                },
+                                ticks: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color'),
+                                    callback: function(value) {
+                                        return formatCurrency(value);
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        },
+                        stacked: isRevenueStacked
+                    }
+                });
+            }
+            
+            function updateSpendChart() {
+                const ctx = document.getElementById('spend-chart').getContext('2d');
+                
+                if (spendChart) spendChart.destroy();
+                
+                spendChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                    labels: formattedMonths,
+datasets: [
+                            {
+                                label: 'Google Spend',
+                                data: googleSpend,
+                                borderColor: '#4f46e5',
+                                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            },
+                            {
+                                label: 'Meta Spend',
+                                data: metaSpend,
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.3,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${formatCurrency(context.raw)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--border-color')
+                                },
+                                ticks: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--border-color')
+                                },
+                                ticks: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color'),
+                                    callback: function(value) {
+                                        return formatCurrency(value);
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    }
+                });
+            }
+            
+            function updateOrdersChart() {
+                const ctx = document.getElementById('orders-chart').getContext('2d');
+                
+                if (ordersChart) ordersChart.destroy();
+                
+                ordersChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                    labels: formattedMonths,
+datasets: [
+                            {
+                                label: 'Google Orders',
+                                data: googleOrders,
+                                backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                                borderColor: '#4f46e5',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Meta Orders',
+                                data: metaOrders,
+                                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                                borderColor: '#3b82f6',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Shopify Orders',
+                                data: shopifyOrders,
+                                backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                                borderColor: '#10b981',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${context.raw}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                stacked: isOrdersStacked,
+                                grid: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--border-color')
+                                },
+                                ticks: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                                }
+                            },
+                            y: {
+                                stacked: isOrdersStacked,
+                                grid: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--border-color')
+                                },
+                                ticks: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color'),
+                                    precision: 0
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    }
+                });
+            }
+            
+            function updateRoasChart() {
+                const ctx = document.getElementById('roas-chart').getContext('2d');
+                
+                if (roasChart) roasChart.destroy();
+                
+                roasChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                    labels: formattedMonths,
+datasets: [
+                            {
+                                label: 'Google ROAS',
+                                data: googleRoas,
+                                borderColor: '#4f46e5',
+                                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                                tension: 0.3,
+                                fill: false
+                            },
+                            {
+                                label: 'Meta ROAS',
+                                data: metaRoas,
+                                borderColor: '#3b82f6',
+                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                tension: 0.3,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${context.raw.toFixed(2)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--border-color')
+                                },
+                                ticks: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--border-color')
+                                },
+                                ticks: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    }
+                });
+            }
+            
+            function updateSourcePieChart() {
+                // Calculate totals by source
+                const googleTotal = filteredData
+                    .filter(item => item.source === 'google')
+                    .reduce((sum, item) => sum + item.revenue, 0);
+                
+                const metaTotal = filteredData
+                    .filter(item => item.source === 'meta')
+                    .reduce((sum, item) => sum + item.revenue, 0);
+                
+                const shopifyTotal = filteredData
+                    .filter(item => item.source === 'shopify')
+                    .reduce((sum, item) => sum + item.revenue, 0);
+                
+                const ctx = document.getElementById('source-pie-chart').getContext('2d');
+                
+                if (sourcePieChart) sourcePieChart.destroy();
+                
+                sourcePieChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Google', 'Meta', 'Shopify'],
+                        datasets: [{
+                            data: [googleTotal, metaTotal, shopifyTotal],
+                            backgroundColor: [
+                                'rgba(79, 70, 229, 0.7)',
+                                'rgba(59, 130, 246, 0.7)',
+                                'rgba(16, 185, 129, 0.7)'
+                            ],
+                            borderColor: [
+                                '#4f46e5',
+                                '#3b82f6',
+                                '#10b981'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const value = context.raw;
+                                        const percentage = Math.round((value / total) * 100);
+                                        return `${context.label}: ${formatCurrency(value)} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            function updateMonthlyTrendsChart() {
+                // Group data by month
+                const monthlyData = {};
+                
+                filteredData.forEach(item => {
+                    const monthKey = `${item.date.getFullYear()}-${item.date.getMonth()}`;
+                    
+                    if (!monthlyData[monthKey]) {
+                        monthlyData[monthKey] = {
+                            date: new Date(item.date.getFullYear(), item.date.getMonth(), 1),
+                            google: { revenue: 0, spend: 0, orders: 0 },
+                            meta: { revenue: 0, spend: 0, orders: 0 },
+                            shopify: { revenue: 0, spend: 0, orders: 0 }
+                        };
+                    }
+                    
+                    if (item.source === 'google') {
+                        monthlyData[monthKey].google.revenue += item.revenue;
+                        monthlyData[monthKey].google.spend += item.spend;
+                        monthlyData[monthKey].google.orders += item.orders;
+                    } else if (item.source === 'meta') {
+                        monthlyData[monthKey].meta.revenue += item.revenue;
+                        monthlyData[monthKey].meta.spend += item.spend;
+                        monthlyData[monthKey].meta.orders += item.orders;
+                    } else if (item.source === 'shopify') {
+                        monthlyData[monthKey].shopify.revenue += item.revenue;
+                        monthlyData[monthKey].shopify.spend += item.spend;
+                        monthlyData[monthKey].shopify.orders += item.orders;
+                    }
+                });
+                
+                // Sort months chronologically
+                const sortedMonths = Object.values(monthlyData).sort((a, b) => a.date - b.date);
+                const monthLabels = sortedMonths.map(month => month.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' }));
+                
+                const googleRevenue = sortedMonths.map(month => month.google.revenue);
+                const metaRevenue = sortedMonths.map(month => month.meta.revenue);
+                const shopifyRevenue = sortedMonths.map(month => month.shopify.revenue);
+                
+                const googleSpend = sortedMonths.map(month => month.google.spend);
+                const metaSpend = sortedMonths.map(month => month.meta.spend);
+                
+                const ctx = document.getElementById('monthly-trends-chart').getContext('2d');
+                
+                if (monthlyTrendsChart) monthlyTrendsChart.destroy();
+                
+                monthlyTrendsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: monthLabels,
+                        datasets: [
+                            {
+                                label: 'Google Revenue',
+                                data: googleRevenue,
+                                backgroundColor: 'rgba(79, 70, 229, 0.7)',
+                                borderColor: '#4f46e5',
+                                borderWidth: 1,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Meta Revenue',
+                                data: metaRevenue,
+                                backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                                borderColor: '#3b82f6',
+                                borderWidth: 1,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Shopify Revenue',
+                                data: shopifyRevenue,
+                                backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                                borderColor: '#10b981',
+                                borderWidth: 1,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Google Spend',
+                                data: googleSpend,
+                                backgroundColor: 'rgba(79, 70, 229, 0.3)',
+                                borderColor: '#4f46e5',
+                                borderWidth: 1,
+                                type: 'line',
+                                yAxisID: 'y1'
+                            },
+                            {
+                                label: 'Meta Spend',
+                                data: metaSpend,
+                                backgroundColor: 'rgba(59, 130, 246, 0.3)',
+                                borderColor: '#3b82f6',
+                                borderWidth: 1,
+                                type: 'line',
+                                yAxisID: 'y1'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${formatCurrency(context.raw)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                stacked: false,
+                                grid: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--border-color')
+                                },
+                                ticks: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                                }
+                            },
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: {
+                                    display: true,
+                                    text: 'Revenue',
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                                },
+                                grid: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--border-color')
+                                },
+                                ticks: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color'),
+                                    callback: function(value) {
+                                        return formatCurrency(value);
+                                    }
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                title: {
+                                    display: true,
+                                    text: 'Spend',
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color')
+                                },
+                                grid: {
+                                    drawOnChartArea: false,
+                                    color: getComputedStyle(document.body).getPropertyValue('--border-color')
+                                },
+                                ticks: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-color'),
+                                    callback: function(value) {
+                                        return formatCurrency(value);
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    }
+                });
+            }
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        }
+
+        function showLoading() {
+            loadingOverlay.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+        }
+    </script>
+    <script>feather.replace();</script>
+<script src="https://huggingface.co/deepsite/deepsite-badge.js"></script>
+</body>
+</html>
