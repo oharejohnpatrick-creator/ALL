@@ -1,1 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paid Ads Profit Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .input-group:focus-within label { color: #3b82f6; }
+        .input-group:focus-within i { color: #3b82f6; }
+        .result-card { transition: all 0.3s ease; }
+        .result-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+        .positive { color: #059669; }
+        .negative { color: #dc2626; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen p-4 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8 fade-in">
+            <!-- Your Logo - Replace 'logo.png' with your actual logo file -->
+            <div class="mb-4">
+                <img src="logo.png" alt="Company Logo" class="h-16 md:h-20 w-auto mx-auto object-contain drop-shadow-sm">
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-800 mb-2">Paid Ads Profit Calculator</h1>
+            <p class="text-slate-600 max-w-2xl mx-auto">Calculate your monthly ad performance, break-even points, and profitability metrics in real-time.</p>
+        </div>
 
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Column: Inputs -->
+            <div class="space-y-6 fade-in" style="animation-delay: 0.1s;">
+                <!-- Input Card -->
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-semibold text-slate-800 flex items-center gap-2">
+                            <i data-lucide="sliders" class="w-5 h-5 text-blue-600"></i>
+                            Campaign Inputs
+                        </h2>
+                        <button onclick="resetDefaults()" class="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 px-3 py-1 rounded-lg hover:bg-blue-50 transition-colors">
+                            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                            Reset to Defaults
+                        </button>
+                    </div>
+
+                    <!-- Days in Month Toggle -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Month Length</label>
+                        <div class="flex gap-2 bg-slate-100 p-1 rounded-xl">
+                            <button onclick="setDays(28)" id="btn-28" class="flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900">28 Days</button>
+                            <button onclick="setDays(30)" id="btn-30" class="flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all bg-white text-blue-600 shadow-sm">30 Days</button>
+                            <button onclick="setDays(31)" id="btn-31" class="flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900">31 Days</button>
+                        </div>
+                    </div>
+
+                    <!-- Input Fields -->
+                    <div class="space-y-4">
+                        <!-- AOV -->
+                        <div class="input-group">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1 flex items-center gap-2">
+                                Average Order Value (AOV)
+                                <span class="text-xs text-slate-400 font-normal">Revenue per conversion</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-slate-500 font-semibold">$</span>
+                                </div>
+                                <input type="number" id="aov" value="60" min="0" step="0.01" 
+                                    class="block w-full pl-8 pr-3 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium text-slate-800 bg-slate-50 focus:bg-white"
+                                    oninput="calculate()">
+                            </div>
+                        </div>
+
+                        <!-- CPA -->
+                        <div class="input-group">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1 flex items-center gap-2">
+                                Cost Per Acquisition (CPA)
+                                <span class="text-xs text-slate-400 font-normal">Cost per conversion</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-slate-500 font-semibold">$</span>
+                                </div>
+                                <input type="number" id="cpa" value="40" min="0" step="0.01" 
+                                    class="block w-full pl-8 pr-3 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium text-slate-800 bg-slate-50 focus:bg-white"
+                                    oninput="calculate()">
+                            </div>
+                            <p id="cpa-error" class="hidden text-sm text-red-600 mt-1 flex items-center gap-1">
+                                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                                CPA must be greater than 0
+                            </p>
+                        </div>
+
+                        <!-- Product Margin -->
+                        <div class="input-group">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1 flex items-center gap-2">
+                                Product Margin
+                                <span class="text-xs text-slate-400 font-normal">Gross margin percentage</span>
+                            </label>
+                            <div class="relative">
+                                <input type="number" id="margin" value="50" min="0" max="100" step="1" 
+                                    class="block w-full pl-4 pr-8 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium text-slate-800 bg-slate-50 focus:bg-white"
+                                    oninput="validateMargin(this); calculate()">
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <span class="text-slate-500 font-semibold">%</span>
+                                </div>
+                            </div>
+                            <p id="margin-error" class="hidden text-sm text-red-600 mt-1 flex items-center gap-1">
+                                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                                Margin must be between 0% and 100%
+                            </p>
+                        </div>
+
+                        <!-- Daily Ad Spend -->
+                        <div class="input-group">
+                            <label class="block text-sm font-semibold text-slate-700 mb-1 flex items-center gap-2">
+                                Daily Ad Spend
+                                <span class="text-xs text-slate-400 font-normal">Budget per day</span>
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span class="text-slate-500 font-semibold">$</span>
+                                </div>
+                                <input type="number" id="dailySpend" value="100" min="0" step="0.01" 
+                                    class="block w-full pl-8 pr-3 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-medium text-slate-800 bg-slate-50 focus:bg-white"
+                                    oninput="calculate()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Collapsible Formula Section -->
+                <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+                    <button onclick="toggleFormulas()" class="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-colors">
+                        <div class="flex items-center gap-2 text-slate-700 font-semibold">
+                            <i data-lucide="book-open" class="w-5 h-5 text-blue-600"></i>
+                            Formulas & Calculations
+                        </div>
+                        <i data-lucide="chevron-down" id="formula-chevron" class="w-5 h-5 text-slate-400 transition-transform"></i>
+                    </button>
+                    <div id="formula-content" class="hidden px-6 pb-6 border-t border-slate-100">
+                        <div class="mt-4 space-y-2 text-sm text-slate-600 font-mono bg-slate-50 p-4 rounded-xl">
+                            <div><span class="text-blue-600 font-semibold">Monthly Spend</span> = Daily Spend × Days in Month</div>
+                            <div><span class="text-blue-600 font-semibold">Conversions</span> = Monthly Spend ÷ CPA</div>
+                            <div><span class="text-blue-600 font-semibold">Gross Revenue</span> = Conversions × AOV</div>
+                            <div><span class="text-blue-600 font-semibold">Gross Profit</span> = Gross Revenue × Margin%</div>
+                            <div><span class="text-blue-600 font-semibold">Net Profit</span> = Gross Profit − Monthly Spend</div>
+                            <div><span class="text-blue-600 font-semibold">Break-even CPA</span> = AOV × Margin%</div>
+                            <div><span class="text-blue-600 font-semibold">ROAS</span> = Gross Revenue ÷ Monthly Spend</div>
+                            <div><span class="text-blue-600 font-semibold">Profit/Conv</span> = (AOV × Margin%) − CPA</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Results -->
+            <div class="space-y-6 fade-in" style="animation-delay: 0.2s;">
+                <!-- Main Results Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Monthly Ad Spend -->
+                    <div class="result-card bg-white rounded-2xl shadow-lg border border-slate-200 p-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-blue-50 rounded-bl-full -mr-4 -mt-4 opacity-50"></div>
+                        <div class="relative">
+                            <p class="text-sm font-medium text-slate-500 mb-1 flex items-center gap-2">
+                                <i data-lucide="credit-card" class="w-4 h-4"></i>
+                                Monthly Ad Spend
+                            </p>
+                            <p id="monthlySpend" class="text-3xl font-bold text-slate-800">$3,000.00</p>
+                            <p class="text-xs text-slate-400 mt-1">Total ad budget for period</p>
+                        </div>
+                    </div>
+
+                    <!-- Expected Conversions -->
+                    <div class="result-card bg-white rounded-2xl shadow-lg border border-slate-200 p-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-purple-50 rounded-bl-full -mr-4 -mt-4 opacity-50"></div>
+                        <div class="relative">
+                            <p class="text-sm font-medium text-slate-500 mb-1 flex items-center gap-2">
+                                <i data-lucide="users" class="w-4 h-4"></i>
+                                Expected Conversions
+                            </p>
+                            <p id="conversions" class="text-3xl font-bold text-slate-800">75.0</p>
+                            <p class="text-xs text-slate-400 mt-1">Monthly sales / orders</p>
+                        </div>
+                    </div>
+
+                    <!-- Gross Revenue -->
+                    <div class="result-card bg-white rounded-2xl shadow-lg border border-slate-200 p-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-green-50 rounded-bl-full -mr-4 -mt-4 opacity-50"></div>
+                        <div class="relative">
+                            <p class="text-sm font-medium text-slate-500 mb-1 flex items-center gap-2">
+                                <i data-lucide="trending-up" class="w-4 h-4"></i>
+                                Gross Revenue
+                            </p>
+                            <p id="grossRevenue" class="text-3xl font-bold text-slate-800">$4,500.00</p>
+                            <p class="text-xs text-slate-400 mt-1">Total sales revenue</p>
+                        </div>
+                    </div>
+
+                    <!-- Gross Profit (before ads) -->
+                    <div class="result-card bg-white rounded-2xl shadow-lg border border-slate-200 p-6 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-bl-full -mr-4 -mt-4 opacity-50"></div>
+                        <div class="relative">
+                            <p class="text-sm font-medium text-slate-500 mb-1 flex items-center gap-2">
+                                <i data-lucide="package" class="w-4 h-4"></i>
+                                Gross Profit (before ads)
+                            </p>
+                            <p id="grossProfit" class="text-3xl font-bold text-emerald-600">$2,250.00</p>
+                            <p class="text-xs text-slate-400 mt-1">Revenue minus COGS</p>
+                        </div>
+                    </div>
+
+                    <!-- Net Profit (after ads) - Full Width -->
+                    <div class="result-card bg-white rounded-2xl shadow-lg border border-slate-200 p-6 md:col-span-2 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-50 to-purple-50 rounded-bl-full -mr-8 -mt-8 opacity-50"></div>
+                        <div class="relative flex items-center justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-slate-500 mb-1 flex items-center gap-2">
+                                    <i data-lucide="wallet" class="w-4 h-4"></i>
+                                    Net Profit (after ads)
+                                </p>
+                                <p id="netProfit" class="text-4xl font-bold text-emerald-600">-$750.00</p>
+                                <p class="text-xs text-slate-400 mt-1">Final bottom line profit/loss</p>
+                            </div>
+                            <div id="profitIndicator" class="flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-full text-sm font-semibold">
+                                <i data-lucide="trending-down" class="w-4 h-4"></i>
+                                Losing Money
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Break-even Analysis -->
+                <div class="bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl shadow-lg p-6 text-white">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <i data-lucide="scale" class="w-5 h-5 text-yellow-400"></i>
+                        Break-even Analysis
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white/10 rounded-xl p-4 backdrop-blur">
+                            <p class="text-sm text-slate-300 mb-1">Break-even CPA</p>
+                            <p id="breakevenCPA" class="text-2xl font-bold text-yellow-400">$30.00</p>
+                            <p class="text-xs text-slate-400 mt-1">Max sustainable CPA</p>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-4 backdrop-blur">
+                            <p class="text-sm text-slate-300 mb-1">Current vs Break-even</p>
+                            <p id="cpaComparison" class="text-2xl font-bold text-red-400">33% Above</p>
+                            <p class="text-xs text-slate-400 mt-1">Current CPA status</p>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-4 backdrop-blur">
+                            <p class="text-sm text-slate-300 mb-1">ROAS</p>
+                            <p id="roas" class="text-2xl font-bold text-purple-400">1.50x</p>
+                            <p class="text-xs text-slate-400 mt-1">Return on Ad Spend</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-white/10 flex items-center justify-between text-sm">
+                        <span class="text-slate-300">Profit per Conversion:</span>
+                        <span id="profitPerConv" class="font-bold text-lg text-red-400">-$10.00</span>
+                    </div>
+                </div>
+
+                <!-- Sensitivity Analysis -->
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-6">
+                    <h3 class="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                        <i data-lucide="activity" class="w-5 h-5 text-blue-600"></i>
+                        Sensitivity Analysis
+                        <span class="text-xs font-normal text-slate-500 bg-slate-100 px-2 py-1 rounded-full">What if?</span>
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-slate-200">
+                                    <th class="text-left py-3 px-2 text-slate-600 font-medium">Net Profit if...</th>
+                                    <th class="text-center py-3 px-2 text-slate-600 font-medium">AOV −10%</th>
+                                    <th class="text-center py-3 px-2 text-slate-800 font-bold bg-blue-50/50">AOV Current</th>
+                                    <th class="text-center py-3 px-2 text-slate-600 font-medium">AOV +10%</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100" id="sensitivityTable">
+                                <tr>
+                                    <td class="py-3 px-2 font-medium text-slate-700">CPA −10%</td>
+                                    <td class="py-3 px-2 text-center font-mono" id="cell-low-low">-$450</td>
+                                    <td class="py-3 px-2 text-center font-mono bg-blue-50/30" id="cell-low-mid">-$150</td>
+                                    <td class="py-3 px-2 text-center font-mono" id="cell-low-high">$150</td>
+                                </tr>
+                                <tr class="bg-slate-50/50">
+                                    <td class="py-3 px-2 font-bold text-slate-800">CPA Current</td>
+                                    <td class="py-3 px-2 text-center font-mono" id="cell-mid-low">-$1,050</td>
+                                    <td class="py-3 px-2 text-center font-mono bg-blue-100/50 font-bold text-blue-900" id="cell-mid-mid">-$750</td>
+                                    <td class="py-3 px-2 text-center font-mono" id="cell-mid-high">-$450</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-2 font-medium text-slate-700">CPA +10%</td>
+                                    <td class="py-3 px-2 text-center font-mono" id="cell-high-low">-$1,650</td>
+                                    <td class="py-3 px-2 text-center font-mono bg-blue-50/30" id="cell-high-mid">-$1,350</td>
+                                    <td class="py-3 px-2 text-center font-mono" id="cell-high-high">-$1,050</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-3 italic">Table shows Net Profit (after ads) under different CPA and AOV scenarios</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let daysInMonth = 30;
+        const defaults = {
+            aov: 60,
+            cpa: 40,
+            margin: 50,
+            dailySpend: 100,
+            days: 30
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            calculate();
+            updateDayButtons(30); // Ensure initial button state is correct
+        });
+
+        function updateDayButtons(selectedDays) {
+            [28, 30, 31].forEach(d => {
+                const btn = document.getElementById(`btn-${d}`);
+                if (!btn) return;
+                
+                if (d === selectedDays) {
+                    btn.className = 'flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all bg-white text-blue-600 shadow-sm';
+                } else {
+                    btn.className = 'flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all text-slate-600 hover:text-slate-900 hover:bg-slate-200/50';
+                }
+            });
+        }
+
+        function setDays(days) {
+            daysInMonth = days;
+            updateDayButtons(days);
+            calculate();
+        }
+
+        function validateMargin(input) {
+            let val = parseFloat(input.value);
+            const errorEl = document.getElementById('margin-error');
+            
+            if (val < 0 || val > 100 || isNaN(val)) {
+                errorEl.classList.remove('hidden');
+                input.classList.add('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+                input.classList.remove('focus:ring-blue-500', 'focus:border-blue-500');
+            } else {
+                errorEl.classList.add('hidden');
+                input.classList.remove('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+                input.classList.add('focus:ring-blue-500', 'focus:border-blue-500');
+            }
+        }
+
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(num);
+        }
+
+        function formatNumber(num, decimals = 1) {
+            return new Intl.NumberFormat('en-US', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            }).format(num);
+        }
+
+        function calculate() {
+            // Get inputs
+            const aov = parseFloat(document.getElementById('aov').value) || 0;
+            const cpa = parseFloat(document.getElementById('cpa').value) || 0;
+            const marginPct = (parseFloat(document.getElementById('margin').value) || 0) / 100;
+            const dailyAdSpend = parseFloat(document.getElementById('dailySpend').value) || 0;
+
+            // Validation
+            const cpaError = document.getElementById('cpa-error');
+            const cpaInput = document.getElementById('cpa');
+            
+            if (cpa <= 0) {
+                cpaError.classList.remove('hidden');
+                cpaInput.classList.add('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+                cpaInput.classList.remove('focus:ring-blue-500', 'focus:border-blue-500');
+                
+                // Zero out dependent values
+                document.getElementById('conversions').textContent = '0.0';
+                document.getElementById('grossRevenue').textContent = formatCurrency(0);
+                document.getElementById('grossProfit').textContent = formatCurrency(0);
+                document.getElementById('netProfit').textContent = formatCurrency(0);
+                document.getElementById('roas').textContent = '0.00x';
+                document.getElementById('profitPerConv').textContent = formatCurrency(0);
+                
+                // Still calculate spend
+                const monthlySpend = dailyAdSpend * daysInMonth;
+                document.getElementById('monthlySpend').textContent = formatCurrency(monthlySpend);
+                
+                updateProfitIndicator(0);
+                calculateSensitivity(aov, cpa, marginPct, dailyAdSpend, true);
+                return;
+            } else {
+                cpaError.classList.add('hidden');
+                cpaInput.classList.remove('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+                cpaInput.classList.add('focus:ring-blue-500', 'focus:border-blue-500');
+            }
+
+            // Core Calculations
+            const monthlySpend = dailyAdSpend * daysInMonth;
+            const conversions = monthlySpend / cpa;
+            const grossRevenue = conversions * aov;
+            const grossProfitBeforeAds = grossRevenue * marginPct;
+            const netProfitAfterAds = grossProfitBeforeAds - monthlySpend;
+            const breakevenCPA = aov * marginPct;
+            const roas = monthlySpend > 0 ? grossRevenue / monthlySpend : 0;
+            const profitPerConversion = (aov * marginPct) - cpa;
+
+            // Update DOM
+            document.getElementById('monthlySpend').textContent = formatCurrency(monthlySpend);
+            document.getElementById('conversions').textContent = formatNumber(conversions, 1);
+            document.getElementById('grossRevenue').textContent = formatCurrency(grossRevenue);
+            document.getElementById('grossProfit').textContent = formatCurrency(grossProfitBeforeAds);
+            document.getElementById('netProfit').textContent = formatCurrency(netProfitAfterAds);
+            document.getElementById('breakevenCPA').textContent = formatCurrency(breakevenCPA);
+            document.getElementById('roas').textContent = formatNumber(roas, 2) + 'x';
+            document.getElementById('profitPerConv').textContent = formatCurrency(profitPerConversion);
+
+            // CPA Comparison
+            const cpaDiff = ((cpa - breakevenCPA) / breakevenCPA) * 100;
+            const cpaCompEl = document.getElementById('cpaComparison');
+            if (cpa > breakevenCPA) {
+                cpaCompEl.textContent = `${formatNumber(Math.abs(cpaDiff), 0)}% Above`;
+                cpaCompEl.className = 'text-2xl font-bold text-red-400';
+            } else if (cpa < breakevenCPA) {
+                cpaCompEl.textContent = `${formatNumber(Math.abs(cpaDiff), 0)}% Below`;
+                cpaCompEl.className = 'text-2xl font-bold text-emerald-400';
+            } else {
+                cpaCompEl.textContent = 'At Break-even';
+                cpaCompEl.className = 'text-2xl font-bold text-yellow-400';
+            }
+
+            // Styling based on profitability
+            const grossProfitEl = document.getElementById('grossProfit');
+            const netProfitEl = document.getElementById('netProfit');
+            const profitPerConvEl = document.getElementById('profitPerConv');
+            
+            grossProfitEl.className = `text-3xl font-bold ${grossProfitBeforeAds >= 0 ? 'text-emerald-600' : 'text-red-600'}`;
+            netProfitEl.className = `text-4xl font-bold ${netProfitAfterAds >= 0 ? 'text-emerald-600' : 'text-red-600'}`;
+            profitPerConvEl.className = `font-bold text-lg ${profitPerConversion >= 0 ? 'text-emerald-400' : 'text-red-400'}`;
+
+            updateProfitIndicator(netProfitAfterAds);
+            calculateSensitivity(aov, cpa, marginPct, dailyAdSpend, false);
+        }
+
+        function updateProfitIndicator(netProfit) {
+            const indicator = document.getElementById('profitIndicator');
+            if (netProfit > 0) {
+                indicator.className = 'flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold';
+                indicator.innerHTML = '<i data-lucide="trending-up" class="w-4 h-4"></i> Profitable';
+            } else if (netProfit < 0) {
+                indicator.className = 'flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-full text-sm font-semibold';
+                indicator.innerHTML = '<i data-lucide="trending-down" class="w-4 h-4"></i> Losing Money';
+            } else {
+                indicator.className = 'flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-full text-sm font-semibold';
+                indicator.innerHTML = '<i data-lucide="minus" class="w-4 h-4"></i> Break-even';
+            }
+            lucide.createIcons();
+        }
+
+        function calculateSensitivity(baseAOV, baseCPA, marginPct, dailySpend, hasError) {
+            if (hasError || baseCPA <= 0) {
+                // Clear table or show zeros
+                const cells = ['cell-low-low', 'cell-low-mid', 'cell-low-high', 'cell-mid-low', 'cell-mid-mid', 'cell-mid-high', 'cell-high-low', 'cell-high-mid', 'cell-high-high'];
+                cells.forEach(id => {
+                    document.getElementById(id).textContent = '$0.00';
+                    document.getElementById(id).className = 'py-3 px-2 text-center font-mono text-slate-400';
+                });
+                return;
+            }
+
+            const monthlySpend = dailySpend * daysInMonth;
+            const scenarios = [
+                { cpa: baseCPA * 0.9, aov: baseAOV * 0.9, id: 'cell-low-low' },
+                { cpa: baseCPA * 0.9, aov: baseAOV, id: 'cell-low-mid' },
+                { cpa: baseCPA * 0.9, aov: baseAOV * 1.1, id: 'cell-low-high' },
+                { cpa: baseCPA, aov: baseAOV * 0.9, id: 'cell-mid-low' },
+                { cpa: baseCPA, aov: baseAOV, id: 'cell-mid-mid' },
+                { cpa: baseCPA, aov: baseAOV * 1.1, id: 'cell-mid-high' },
+                { cpa: baseCPA * 1.1, aov: baseAOV * 0.9, id: 'cell-high-low' },
+                { cpa: baseCPA * 1.1, aov: baseAOV, id: 'cell-high-mid' },
+                { cpa: baseCPA * 1.1, aov: baseAOV * 1.1, id: 'cell-high-high' }
+            ];
+
+            scenarios.forEach(scenario => {
+                const conversions = monthlySpend / scenario.cpa;
+                const revenue = conversions * scenario.aov;
+                const grossProfit = revenue * marginPct;
+                const netProfit = grossProfit - monthlySpend;
+                
+                const cell = document.getElementById(scenario.id);
+                cell.textContent = formatCurrency(netProfit);
+                
+                // Color coding
+                if (netProfit > 0) {
+                    cell.className = 'py-3 px-2 text-center font-mono text-emerald-600 font-semibold';
+                } else if (netProfit < 0) {
+                    cell.className = 'py-3 px-2 text-center font-mono text-red-600';
+                } else {
+                    cell.className = 'py-3 px-2 text-center font-mono text-slate-600';
+                }
+            });
+        }
+
+        function resetDefaults() {
+            document.getElementById('aov').value = defaults.aov;
+            document.getElementById('cpa').value = defaults.cpa;
+            document.getElementById('margin').value = defaults.margin;
+            document.getElementById('dailySpend').value = defaults.dailySpend;
+            
+            // Clear validation errors
+            document.getElementById('cpa-error').classList.add('hidden');
+            document.getElementById('margin-error').classList.add('hidden');
+            document.getElementById('cpa').classList.remove('border-red-500', 'focus:ring-red-500', 'focus:border-red-500');
+            document.getElementById('cpa').classList.add('focus:ring-blue-500', 'focus:border-blue-500');
+            
+            // Update days and recalculate
+            setDays(defaults.days);
+        }
+
+        function toggleFormulas() {
+            const content = document.getElementById('formula-content');
+            const chevron = document.getElementById('formula-chevron');
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+    </script>
+</body>
+</html>
