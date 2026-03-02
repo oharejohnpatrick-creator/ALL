@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Coaching Program — Year One</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #fafafa;
+        }
+        
+        .phase-nav {
+            position: sticky;
+            top: 0;
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+            z-index: 100;
+        }
+        
+        .phase-nav a {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 16px 0;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .phase-nav a:hover,
+        .phase-nav a.active {
+            color: #047857;
+            border-bottom-color: #047857;
+        }
+        
+        .timeline-container {
+            position: relative;
+            padding: 40px 0;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e5e5e5;
+            border-radius: 2px;
+        }
+        
+        .timeline-progress {
+            position: absolute;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #047857 0%, #10b981 100%);
+            border-radius: 2px;
+        }
+        
+        .session-marker {
+            position: relative;
+            z-index: 10;
+        }
+        
+        .session-dot {
+            width: 16px;
+            height: 16px;
+            background: #047857;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .session-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #047857;
+            margin-top: 8px;
+            white-space: nowrap;
+        }
+        
+        .cadence-bar {
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 16px;
+        }
+        
+        .cadence-intensive {
+            background: #047857;
+        }
+        
+        .cadence-sustaining {
+            background: #9ca3af;
+        }
+        
+        .phase-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e5e5e5;
+            overflow: hidden;
+        }
+        
+        .phase-header {
+            padding: 24px 32px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e5e5;
+        }
+        
+        .phase-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: #047857;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+        
+        .outcome-box {
+            background: #f0fdf4;
+            border-left: 4px solid #047857;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .metric-card {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e5e5e5;
+        }
+        
+        .metric-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: #047857;
+        }
+        
+        @media (max-width: 768px) {
+            .phase-nav .container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .phase-nav a {
+                white-space: nowrap;
+                padding: 16px 20px;
+            }
+            
+            .timeline-container {
+                overflow-x: auto;
+            }
+            
+            .session-marker {
+                min-width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200">
+        <div class="max-w-6xl mx-auto px-6 py-8">
+            <p class="text-sm font-semibold text-emerald-700 uppercase tracking-wide mb-2">Executive Coaching Program</p>
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">Year One: From Assessment to Operational Excellence</h1>
+            <p class="text-lg text-gray-600 max-w-3xl">A structured 12-month engagement designed for senior leaders ready to transform organizational performance through systematic coaching and implementation.</p>
+        </div>
+    </header>
+
+    <!-- Phase Navigation -->
+    <nav class="phase-nav">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex gap-8">
+                <a href="#overview" class="active">Overview</a>
+                <a href="#phase1">Phase 1: Prepare</a>
+                <a href="#phase2">Phase 2: Align</a>
+                <a href="#phase3">Phase 3: Implement</a>
+                <a href="#phase4">Phase 4: Sustain</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-6 py-12">
+        
+        <!-- At a Glance -->
+        <section id="overview" class="mb-16">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">At a Glance</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="metric-card">
+                    <p class="metric-number">12</p>
+                    <p class="text-sm text-gray-600 mt-1">Months</p>
+                </div>
+                <div class="metric-card">
+                    <p class="metric-number">7</p>
+                    <p class="text-sm text-gray-600 mt-1">Core Sessions</p>
+                </div>
+                <div class="metric-card">
+                    <p class="metric-number">20+</p>
+                    <p class="text-sm text-gray-600 mt-1">Hours Coaching</p>
+                </div>
+                <div classmetric-card">
+                    <p class="metric-number">4</p>
+                    <p class="text-sm text-gray-600 mt-1">Strategic Playbooks</p>
+                </div>
+            </div>
+
+            <!-- Timeline Visualization -->
+            <div class="bg-white rounded-xl border border-gray-200 p-6 md:p-8">
+                <h3 class="font-semibold text-gray-900 mb-6">Program Timeline</h3>
+                <div class="timeline-container">
+                    <div class="timeline-line"></div>
+                    <div class="timeline-progress"></div>
+                    
+                    <div class="flex justify-between relative">
+                        <!-- Session 1 -->
+                        <div class="session-marker flex flex-col items-center">
+                            <div class="session-dot"></div>
+                            <span class="session-label">Session 1</span>
+                            <span class="text-xs text-gray-500 mt-1">Month 1</span>
+                            <div class="cadence-bar cadence-intensive w-16"></div>
+                        </div>
+                        
+                        <!-- Session 2 -->
+                        <div class="session-marker flex flex-col items-center">
+                            <div class="session-dot"></div>
+                            <span class="session-label">Session 2</span>
+                            <span class="text-xs text-gray-500 mt-1">Month 2</span>
+                            <div class="cadence-bar cadence-intensive w-12"></div>
+                        </div>
+                        
+                        <!-- Session 3 -->
+                        <div class="session-marker flex flex-col items-center">
+                            <div class="session-dot"></div>
+                            <span class="session-label">Session 3</span>
+                            <span class="text-xs text-gray-500 mt-1">Month 3</span>
+                            <div class="cadence-bar cadence-intensive w-12"></div>
+                        </div>
+                        
+                        <!-- Session 4 -->
+                        <div class="session-marker flex flex-col items-center">
+                            <div class="session-dot"></div>
+                            <span class="session-label">Session 4</span>
+                            <span class="text-xs text-gray-500 mt-1">Month 4</span>
+                            <div class="cadence-bar cadence-sustaining w-20"></div>
+                        </div>
+                        
+                        <!-- Session 5 -->
+                        <div class="session-marker flex flex-col items-center">
+                            <div class="session-dot"></div>
+                            <span class="session-label">Session 5</span>
+                            <span class="text-xs text-gray-500 mt-1">Month 6</span>
+                            <div class="cadence-bar cadence-sustaining w-24"></div>
+                        </div>
+                        
+                        <!-- Session 6 -->
+                        <div class="session-marker flex flex-col items-center">
+                            <div class="session-dot"></div>
+                            <span class="session-label">Session 6</span>
+                            <span class="text-xs text-gray-500 mt-1">Month 9</span>
+                            <div class="cadence-bar cadence-sustaining w-24"></div>
+                        </div>
+                        
+                        <!-- Session 7 -->
+                        <div class="session-marker flex flex-col items-center">
+                            <div class="session-dot"></div>
+                            <span class="session-label">Session 7</span>
+                            <span class="text-xs text-gray-500 mt-1">Month 12</span>
+                            <div class="cadence-bar w-0"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quarter markers -->
+                    <div class="flex justify-between mt-6 pt-4 border-t border-gray-200">
+                        <span class="text-xs font-medium text-gray-500">Q1: Intensive</span>
+                        <span class="text-xs font-medium text-gray-500">Q2: Build</span>
+                        <span class="text-xs font-medium text-gray-500">Q3: Scale</span>
+                        <span class="text-xs font-medium text-gray-500">Q4: Sustain</span>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex items-center gap-6 text-sm">
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-2 bg-emerald-700 rounded"></div>
+                        <span class="text-gray-600">Weekly coaching (Q1)</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-2 bg-gray-400 rounded"></div>
+                        <span class="text-gray-600">Monthly coaching (Q2–Q4)</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 1 -->
+        <section id="phase1" class="mb-12">
+            <div class="phase-card">
+                <div class="phase-header">
+                    <div class="flex items-center mb-2">
+                        <span class="phase-number">1</span>
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Prepare for Coaching</h2>
+                            <p class="text-gray-600">Decision & onboarding • 2–4 weeks</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-8">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="font-semibold text-gray-900 mb-4">What happens</h3>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                                    <span><strong>90-minute discovery call</strong> — Assess fit, clarify goals, define success metrics</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                                    <span><strong>Stakeholder alignment</strong> — Confirm sponsor expectations and reporting structure</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                                    <span><strong>Assessment intake</strong> — 360° feedback, behavioral inventory, organizational review</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="outcome-box">
+                                <p class="font-semibold text-emerald-900 mb-2">Outcome</p>
+                                <p class="text-emerald-800">Signed engagement letter, confirmed coaching schedule, and documented baseline metrics. Both parties aligned on 12-month objectives.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 2 -->
+        <section id="phase2" class="mb-12">
+            <div class="phase-card">
+                <div class="phase-header">
+                    <div class="flex items-center mb-2">
+                        <span class="phase-number">2</span>
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Align & Design</h2>
+                            <p class="text-gray-600">Strategic clarity • Months 1–2</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-8">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="font-semibold text-gray-900 mb-4">What happens</h3>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                                    <span><strong>Assessment debrief</strong> — Review 360° and behavioral data, identify patterns</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                                    <span><strong>Priority mapping</strong> — Translate organizational goals to personal development targets</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                                    <span><strong>Operating system design</strong> — Build weekly/monthly/quarterly planning architecture</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="outcome-box">
+                                <p class="font-semibold text-emerald-900 mb-2">Outcome</p>
+                                <p class="text-emerald-800">Personal Development Plan with 3–5 priority focus areas. Custom operating system documented and ready for implementation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 3 -->
+        <section id="phase3" class="mb-12">
+            <div class="phase-card">
+                <div class="phase-header">
+                    <div class="flex items-center mb-2">
+                        <span class="phase-number">3</span>
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Implement & Build Skills</h2>
+                            <p class="text-gray-600">Active coaching & practice • Months 3–9</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-8">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="font-semibold text-gray-900 mb-4">What happens</h3>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                                    <span><strong>Weekly coaching sessions</strong> (Q1) → <strong>Monthly sessions</strong> (Q2–Q3)</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                                    <span><strong>Real-time application</strong> — Deploy new tools in live business situations</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                                    <span><strong>Monthly skill modules</strong> — Deep dives on delegation, decision-making, team alignment</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                                    <span><strong>Progress reviews</strong> — Quarterly stakeholder check-ins against baseline metrics</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="outcome-box">
+                                <p class="font-semibold text-emerald-900 mb-2">Outcome</p>
+                                <p class="text-emerald-800">Demonstrable behavior change in priority areas. Team performance metrics improving. Leader operating with new systems as default.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 4 -->
+        <section id="phase4" class="mb-12">
+            <div class="phase-card">
+                <div class="phase-header">
+                    <div class="flex items-center mb-2">
+                        <span class="phase-number">4</span>
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Sustain & Evaluate</h2>
+                            <p class="text-gray-600">Integration & continuation decision • Months 10–12</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-8">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="font-semibold text-gray-900 mb-4">What happens</h3>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                                    <span><strong>Final 360° assessment</strong> — Measure change against Year One baseline</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                                    <span><strong>Impact review</strong> — Document business results and leadership growth</span>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <i data-lucide="check-circle" class="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0"></i>
+                                    <span><strong>Year Two planning</strong> — Define ongoing support needs or transition to self-sustaining</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <div class="outcome-box">
+                                <p class="font-semibold text-emerald-900 mb-2">Outcome</p>
+                                <p class="text-emerald-800">Validated ROI of coaching investment. Clear decision on Year Two engagement structure. Leader equipped for continued growth.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- What You Receive -->
+        <section class="bg-gray-900 rounded-xl p-8 md:p-12 text-white">
+            <h2 class="text-2xl font-bold mb-8">What You Receive</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <i data-lucide="calendar" class="w-8 h-8 text-emerald-400 mb-4"></i>
+                    <h3 class="font-semibold mb-2">Scheduled Sessions</h3>
+                    <p class="text-gray-400 text-sm">7 core coaching sessions plus monthly check-ins and quarterly business reviews</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <i data-lucide="file-text" class="w-8 h-8 text-emerald-400 mb-4"></i>
+                    <h3 class="font-semibold mb-2">Assessment Reports</h3>
+                    <p class="text-gray-400 text-sm">360° feedback, behavioral analysis, and progress tracking documentation</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <i data-lucide="book-open" class="w-8 h-8 text-emerald-400 mb-4"></i>
+                    <h3 class="font-semibold mb-2">Playbooks & Tools</h3>
+                    <p class="text-gray-400 text-sm">Custom operating system, decision frameworks, and team alignment tools</p>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-6">
+                    <i data-lucide="message-circle" class="w-8 h-8 text-emerald-400 mb-4"></i>
+                    <h3 class="font-semibold mb-2">On-Demand Support</h3>
+                    <p class="text-gray-400 text-sm">Text and email access between sessions for urgent situations</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 border-t border-gray-200 py-8">
+        <div class="max-w-6xl mx-auto px-6 text-center text-gray-600 text-sm">
+            <p>Executive Coaching Program • Year One Roadmap</p>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Active nav highlighting on scroll
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.phase-nav a');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
