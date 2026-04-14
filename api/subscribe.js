@@ -9,19 +9,56 @@ export default async function handler(req, res) {
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: 'Email required' });
 
+    const KLAVIYO_API_KEY = 'pk_9245637cf913e59b291db35d6f948bf420';
+    const KLAVIYO_LIST_ID = 'VHFtiP';
+
     try {
-        const response = await fetch(`https://api.convertkit.com/v3/forms/9327427/subscribe`, {
+        const response = await fetch('https://a.klaviyo.com/api/profile-subscription-bulk-create-jobs/', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Klaviyo-API-Key ${KLAVIYO_API_KEY}`,
+                'revision': '2023-12-15'
+            },
             body: JSON.stringify({
-                api_secret: '2NDQqYgsd4-xNFzm3-u7TBUelJR96n0lyRKps2lpXDQ',
-                email: email
+                data: {
+                    type: 'profile-subscription-bulk-create-job',
+                    attributes: {
+                        profiles: {
+                            data: [
+                                {
+                                    type: 'profile',
+                                    attributes: {
+                                        email: email,
+                                        subscriptions: {
+                                            email: {
+                                                marketing: {
+                                                    consent: 'SUBSCRIBED'
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    relationships: {
+                        list: {
+                            data: {
+                                type: 'list',
+                                id: KLAVIYO_LIST_ID
+                            }
+                        }
+                    }
+                }
             })
         });
 
         const data = await response.json();
-        return res.status(200).json({ success: true, data });
+        console.log('Klaviyo response:', JSON.stringify(data));
+        return res.status(200).json({ success: true });
     } catch (error) {
+        console.error('Klaviyo error:', error);
         return res.status(500).json({ error: 'Failed to subscribe' });
     }
 }
