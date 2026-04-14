@@ -17,10 +17,177 @@
         .negative { color: #dc2626; }
         .fade-in { animation: fadeIn 0.3s ease-in; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Email Gate */
+        #email-gate {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        #email-gate.hidden { display: none; }
+        .gate-card {
+            background: white;
+            border-radius: 24px;
+            padding: 48px 40px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+        .gate-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #eff6ff;
+            color: #2563eb;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 999px;
+            margin-bottom: 20px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .gate-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+        }
+        .gate-input:focus { border-color: #3b82f6; }
+        .gate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .gate-btn:hover { background: linear-gradient(135deg, #1d4ed8, #1e40af); transform: translateY(-1px); box-shadow: 0 8px 20px rgba(37,99,235,0.35); }
+        .gate-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        .gate-error { color: #dc2626; font-size: 13px; margin-top: 8px; display: none; }
+        .gate-success { color: #059669; font-size: 13px; margin-top: 8px; display: none; }
+        .gate-features {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 24px 0;
+            text-align: left;
+        }
+        .gate-feature {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #475569;
+        }
+        .gate-feature-icon {
+            width: 28px;
+            height: 28px;
+            background: #eff6ff;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .gate-divider {
+            border: none;
+            border-top: 1px solid #f1f5f9;
+            margin: 24px 0;
+        }
+        @keyframes gateIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .gate-card { animation: gateIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
     </style>
 </head>
-<body class="bg-transparent p-0 m-0">
-    <div class="w-full">
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen p-4 md:p-8">
+
+    <!-- Email Gate Overlay -->
+    <div id="email-gate">
+        <div class="gate-card">
+            <!-- Logo -->
+            <div class="mb-6">
+                <img src="logo.png" alt="Kuma Agency" class="h-12 w-auto mx-auto object-contain" onerror="this.style.display='none'; document.getElementById('gate-logo-fallback').style.display='block'">
+                <div id="gate-logo-fallback" style="display:none; font-size:22px; font-weight:700; color:#1e293b; letter-spacing:-0.5px;">Kuma Agency</div>
+            </div>
+
+            <div class="gate-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+                Free Tool
+            </div>
+
+            <h1 style="font-size:24px; font-weight:700; color:#0f172a; margin-bottom:8px; line-height:1.3;">
+                Know if Your Paid Ads<br>Are Actually Profitable
+            </h1>
+            <p style="font-size:14px; color:#64748b; margin-bottom:0; line-height:1.6;">
+                Enter your email for instant access to our free Paid Ads Profit Calculator — used by ecommerce brands to find their real numbers.
+            </p>
+
+            <div class="gate-features">
+                <div class="gate-feature">
+                    <div class="gate-feature-icon">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    </div>
+                    Real-time net profit and ROAS calculation
+                </div>
+                <div class="gate-feature">
+                    <div class="gate-feature-icon">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    </div>
+                    Break-even CPA so you know your ceiling
+                </div>
+                <div class="gate-feature">
+                    <div class="gate-feature-icon">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"></path></svg>
+                    </div>
+                    Sensitivity table across 9 CPA and AOV scenarios
+                </div>
+            </div>
+
+            <hr class="gate-divider">
+
+            <input type="email" id="gate-email" class="gate-input" placeholder="Enter your email address" autocomplete="email">
+            <button class="gate-btn" id="gate-btn" onclick="submitGate()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                Get Free Access
+            </button>
+            <div class="gate-error" id="gate-error">Please enter a valid email address.</div>
+            <div class="gate-success" id="gate-success">You are in! Loading your calculator...</div>
+
+            <p style="font-size:12px; color:#94a3b8; margin-top:16px;">
+                No spam, ever. We will also send you tips on scaling paid ads profitably.
+            </p>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="text-center mb-8 fade-in">
             <!-- Your Logo - Replace 'logo.png' with your actual logo file -->
@@ -533,6 +700,67 @@
             // Update days and recalculate
             setDays(defaults.days);
         }
+
+        // ─── Email Gate ───────────────────────────────────────────────
+        const KIT_API_KEY = 'kit_f9a62b9eead989110b10a9d0fdabbc6c';
+        const KIT_FORM_ID = '9327427';
+        const GATE_STORAGE_KEY = 'kuma_calc_unlocked';
+
+        (function initGate() {
+            if (localStorage.getItem(GATE_STORAGE_KEY) === 'true') {
+                document.getElementById('email-gate').classList.add('hidden');
+            }
+            // Allow Enter key to submit
+            document.getElementById('gate-email').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') submitGate();
+            });
+        })();
+
+        async function submitGate() {
+            const emailInput = document.getElementById('gate-email');
+            const btn = document.getElementById('gate-btn');
+            const errorEl = document.getElementById('gate-error');
+            const successEl = document.getElementById('gate-success');
+            const email = emailInput.value.trim();
+
+            // Basic validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                errorEl.style.display = 'block';
+                successEl.style.display = 'none';
+                emailInput.style.borderColor = '#dc2626';
+                return;
+            }
+
+            errorEl.style.display = 'none';
+            emailInput.style.borderColor = '#e2e8f0';
+            btn.disabled = true;
+            btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0"/></svg> Unlocking...';
+
+            try {
+                await fetch(`https://api.convertkit.com/v3/forms/${KIT_FORM_ID}/subscribe`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ api_key: KIT_API_KEY, email: email })
+                });
+            } catch (e) {
+                // Silent fail — still unlock the calculator. Don't punish the user for a network issue.
+                console.warn('Kit API error:', e);
+            }
+
+            // Unlock regardless of API result
+            localStorage.setItem(GATE_STORAGE_KEY, 'true');
+            successEl.style.display = 'block';
+
+            setTimeout(() => {
+                document.getElementById('email-gate').style.transition = 'opacity 0.5s ease';
+                document.getElementById('email-gate').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('email-gate').classList.add('hidden');
+                }, 500);
+            }, 1200);
+        }
+        // ─────────────────────────────────────────────────────────────
 
         function toggleFormulas() {
             const content = document.getElementById('formula-content');
