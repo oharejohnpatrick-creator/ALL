@@ -54,9 +54,17 @@ export default async function handler(req, res) {
             })
         });
 
-        const data = await response.json();
-        console.log('Klaviyo response:', JSON.stringify(data));
-        return res.status(200).json({ success: true });
+        console.log('Klaviyo status:', response.status);
+        // 202 = accepted, no body returned — that's a success
+        if (response.status === 202 || response.status === 200) {
+            return res.status(200).json({ success: true });
+        }
+
+        // Try to parse error if there is one
+        const text = await response.text();
+        console.log('Klaviyo error body:', text);
+        return res.status(500).json({ error: text });
+
     } catch (error) {
         console.error('Klaviyo error:', error);
         return res.status(500).json({ error: 'Failed to subscribe' });
