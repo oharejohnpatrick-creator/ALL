@@ -13,7 +13,8 @@ export default async function handler(req, res) {
     const KLAVIYO_LIST_ID = 'VHFtiP';
 
     try {
-        const response = await fetch('https://a.klaviyo.com/api/profile-subscription-bulk-create-jobs/', {
+        // First create/get the profile
+        const profileRes = await fetch('https://a.klaviyo.com/api/profiles/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -22,51 +23,45 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify({
                 data: {
-                    type: 'profile-subscription-bulk-create-job',
-                    attributes: {
-                        profiles: {
-                            data: [
-                                {
-                                    type: 'profile',
-                                    attributes: {
-                                        email: email,
-                                        subscriptions: {
-                                            email: {
-                                                marketing: {
-                                                    consent: 'SUBSCRIBED'
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    relationships: {
-                        list: {
-                            data: {
-                                type: 'list',
-                                id: KLAVIYO_LIST_ID
-                            }
-                        }
-                    }
+                    type: 'profile',
+                    attributes: { email: email }
                 }
             })
         });
 
-        console.log('Klaviyo status:', response.status);
-        // 202 = accepted, no body returned — that's a success
-        if (response.status === 202 || response.status === 200) {
-            return res.status(200).json({ success: true });
+        const profileText = await profileRes.text();
+        console.log('Profile status:', profileRes.status, profileText);
+
+        // Extract profile ID (from create or from 409 conflict)
+        let profileId;
+        if (profileRes.status === 201) {
+            profileId = JSON.parse(profileText).data.id;
+        } else if (profileRes.status === 409) {
+            profileId = JSON.parse(profileText).errors[0].meta.duplicate_profile_id;
+        } else {
+            return res.status(500).json({ error: 'Could not create profile', detail: profileText });
         }
 
-        // Try to parse error if there is one
-        const text = await response.text();
-        console.log('Klaviyo error body:', text);
-        return res.status(500).json({ error: text });
+        console.log('Profile ID:', profileId);
+
+        // Add profile to list
+        const listRes = await fetch(`https://a.klaviyo.com/api/lists/${KLAVIYO_LIST_ID}/relationships/profiles/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Klaviyo-API-Key ${KLAVIYO_API_KEY}`,
+                'revision': '2023-12-15'
+            },
+            body: JSON.stringify({
+                data: [{ type: 'profile', id: profileId }]
+            })
+        });
+
+        console.log('List add status:', listRes.status);
+        return res.status(200).json({ success: true });
 
     } catch (error) {
-        console.error('Klaviyo error:', error);
+        console.error('Error:', error);
         return res.status(500).json({ error: 'Failed to subscribe' });
     }
 }
