@@ -116,6 +116,42 @@
             border-top: 1px solid #f1f5f9;
             margin: 24px 0;
         }
+
+        /* CTA Section */
+        #cta-banner {
+            border-radius: 20px;
+            padding: 24px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            transition: background 0.4s ease;
+            margin-top: 8px;
+            margin-bottom: 32px;
+        }
+        #cta-banner.profitable { background: linear-gradient(135deg, #059669, #047857); }
+        #cta-banner.losing { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+        #cta-banner.breakeven { background: linear-gradient(135deg, #d97706, #b45309); }
+        #cta-banner-text {
+            color: white;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        #cta-banner-btn {
+            background: white;
+            color: #1e293b;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 10px 24px;
+            border-radius: 999px;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+        #cta-banner-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
         @keyframes gateIn {
             from { opacity: 0; transform: scale(0.95) translateY(20px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
@@ -476,6 +512,12 @@
                 </div>
             </div>
         </div>
+
+        <!-- CTA Section -->
+        <div id="cta-banner" class="losing">
+            <span id="cta-banner-text">Your ads are losing money — let's fix that together.</span>
+            <a id="cta-banner-btn" href="https://kuma-agency.moxieapp.com/public/discovery-call" target="_blank" rel="noopener">Book a Free Call →</a>
+        </div>
     </div>
 
     <script>
@@ -632,15 +674,24 @@
 
         function updateProfitIndicator(netProfit) {
             const indicator = document.getElementById('profitIndicator');
+            const banner = document.getElementById('cta-banner');
+            const bannerText = document.getElementById('cta-banner-text');
+
             if (netProfit > 0) {
                 indicator.className = 'flex items-center gap-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-full text-sm font-semibold';
                 indicator.innerHTML = '<i data-lucide="trending-up" class="w-4 h-4"></i> Profitable';
+                banner.className = 'profitable';
+                bannerText.textContent = 'Your ads are profitable — ready to scale them further?';
             } else if (netProfit < 0) {
                 indicator.className = 'flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-full text-sm font-semibold';
                 indicator.innerHTML = '<i data-lucide="trending-down" class="w-4 h-4"></i> Losing Money';
+                banner.className = 'losing';
+                bannerText.textContent = 'Your ads are losing money — let\'s fix that together.';
             } else {
                 indicator.className = 'flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-full text-sm font-semibold';
                 indicator.innerHTML = '<i data-lucide="minus" class="w-4 h-4"></i> Break-even';
+                banner.className = 'breakeven';
+                bannerText.textContent = 'You\'re breaking even — there\'s more profit to unlock.';
             }
             lucide.createIcons();
         }
