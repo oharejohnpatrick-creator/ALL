@@ -6,14 +6,19 @@ export default async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-    const { email } = req.body;
+    const { email, firstName, lastName } = req.body;
     if (!email) return res.status(400).json({ error: 'Email required' });
 
     const KLAVIYO_API_KEY = 'pk_9245637cf913e59b291db35d6f948bf420';
     const KLAVIYO_LIST_ID = 'VHFtiP';
 
     try {
-        // First create/get the profile
+        // Build profile attributes
+        const profileAttributes = { email };
+        if (firstName) profileAttributes.first_name = firstName;
+        if (lastName) profileAttributes.last_name = lastName;
+
+        // Step 1: Create or update profile
         const profileRes = await fetch('https://a.klaviyo.com/api/profiles/', {
             method: 'POST',
             headers: {
@@ -24,7 +29,7 @@ export default async function handler(req, res) {
             body: JSON.stringify({
                 data: {
                     type: 'profile',
-                    attributes: { email: email }
+                    attributes: profileAttributes
                 }
             })
         });
@@ -32,7 +37,7 @@ export default async function handler(req, res) {
         const profileText = await profileRes.text();
         console.log('Profile status:', profileRes.status, profileText);
 
-        // Extract profile ID (from create or from 409 conflict)
+        // Extract profile ID
         let profileId;
         if (profileRes.status === 201) {
             profileId = JSON.parse(profileText).data.id;
@@ -44,7 +49,7 @@ export default async function handler(req, res) {
 
         console.log('Profile ID:', profileId);
 
-        // Add profile to list
+        // Step 2: Add profile to list
         const listRes = await fetch(`https://a.klaviyo.com/api/lists/${KLAVIYO_LIST_ID}/relationships/profiles/`, {
             method: 'POST',
             headers: {
