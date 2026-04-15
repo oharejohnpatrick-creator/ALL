@@ -173,6 +173,10 @@
 
             <hr class="gate-divider">
 
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="gate-firstname" class="gate-input" placeholder="First name" autocomplete="given-name" style="margin-bottom:12px;">
+                <input type="text" id="gate-lastname" class="gate-input" placeholder="Last name" autocomplete="family-name" style="margin-bottom:12px;">
+            </div>
             <input type="email" id="gate-email" class="gate-input" placeholder="Enter your email address" autocomplete="email">
             <button class="gate-btn" id="gate-btn" onclick="submitGate()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
@@ -718,10 +722,14 @@
 
         async function submitGate() {
             const emailInput = document.getElementById('gate-email');
+            const firstNameInput = document.getElementById('gate-firstname');
+            const lastNameInput = document.getElementById('gate-lastname');
             const btn = document.getElementById('gate-btn');
             const errorEl = document.getElementById('gate-error');
             const successEl = document.getElementById('gate-success');
             const email = emailInput.value.trim();
+            const firstName = firstNameInput.value.trim();
+            const lastName = lastNameInput.value.trim();
 
             // Basic validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -741,7 +749,7 @@
                 await fetch(`https://calculator-gilt-chi-65.vercel.app/api/subscribe`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email })
+                    body: JSON.stringify({ email: email, firstName: firstName, lastName: lastName })
                 });
             } catch (e) {
                 // Silent fail — still unlock the calculator. Don't punish the user for a network issue.
