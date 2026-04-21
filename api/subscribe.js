@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     const { email, firstName, lastName } = req.body;
     if (!email) return res.status(400).json({ error: 'Email required' });
 
-    const KLAVIYO_API_KEY = 'pk_83c802ba5065c06c3503c835b06f736264';
+    const KLAVIYO_API_KEY = process.env.KLAVIYO_API_KEY;
     const KLAVIYO_LIST_ID = 'VHFtiP';
 
     try {
