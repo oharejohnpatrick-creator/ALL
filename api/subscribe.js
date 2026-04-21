@@ -9,11 +9,15 @@ export default async function handler(req, res) {
     const { email, firstName, lastName } = req.body;
     if (!email) return res.status(400).json({ error: 'Email required' });
 
-    const KLAVIYO_API_KEY = 'pk_9245637cf913e59b291db35d6f948bf420';
+    const KLAVIYO_API_KEY = process.env.KLAVIYO_API_KEY;
     const KLAVIYO_LIST_ID = 'VHFtiP';
 
+    if (!KLAVIYO_API_KEY) {
+        console.error('KLAVIYO_API_KEY environment variable is not set');
+        return res.status(500).json({ error: 'Server configuration error' });
+    }
+
     try {
-        // Build profile attributes
         const profileAttributes = { email };
         if (firstName) profileAttributes.first_name = firstName;
         if (lastName) profileAttributes.last_name = lastName;
@@ -27,27 +31,22 @@ export default async function handler(req, res) {
                 'revision': '2023-12-15'
             },
             body: JSON.stringify({
-                data: {
-                    type: 'profile',
-                    attributes: profileAttributes
-                }
+                data: { type: 'profile', attributes: profileAttributes }
             })
         });
 
         const profileText = await profileRes.text();
-        console.log('Profile status:', profileRes.status, profileText);
+        console.log('Profile status:', profileRes.status);
 
-        // Extract profile ID
         let profileId;
         if (profileRes.status === 201) {
             profileId = JSON.parse(profileText).data.id;
         } else if (profileRes.status === 409) {
             profileId = JSON.parse(profileText).errors[0].meta.duplicate_profile_id;
         } else {
-            return res.status(500).json({ error: 'Could not create profile', detail: profileText });
+            console.error('Profile error:', profileText);
+            return res.status(500).json({ error: 'Could not create profile' });
         }
-
-        console.log('Profile ID:', profileId);
 
         // Step 2: Add profile to list
         const listRes = await fetch(`https://a.klaviyo.com/api/lists/${KLAVIYO_LIST_ID}/relationships/profiles/`, {
