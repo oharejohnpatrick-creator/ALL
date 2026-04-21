@@ -9,20 +9,14 @@ export default async function handler(req, res) {
     const { email, firstName, lastName } = req.body;
     if (!email) return res.status(400).json({ error: 'Email required' });
 
-    const KLAVIYO_API_KEY = process.env.KLAVIYO_API_KEY;
+    const KLAVIYO_API_KEY = 'pk_83c802ba5065c06c3503c835b06f736264';
     const KLAVIYO_LIST_ID = 'VHFtiP';
-
-    if (!KLAVIYO_API_KEY) {
-        console.error('KLAVIYO_API_KEY environment variable is not set');
-        return res.status(500).json({ error: 'Server configuration error' });
-    }
 
     try {
         const profileAttributes = { email };
         if (firstName) profileAttributes.first_name = firstName;
         if (lastName) profileAttributes.last_name = lastName;
 
-        // Step 1: Create or update profile
         const profileRes = await fetch('https://a.klaviyo.com/api/profiles/', {
             method: 'POST',
             headers: {
@@ -36,7 +30,7 @@ export default async function handler(req, res) {
         });
 
         const profileText = await profileRes.text();
-        console.log('Profile status:', profileRes.status);
+        console.log('Profile status:', profileRes.status, profileText);
 
         let profileId;
         if (profileRes.status === 201) {
@@ -44,11 +38,9 @@ export default async function handler(req, res) {
         } else if (profileRes.status === 409) {
             profileId = JSON.parse(profileText).errors[0].meta.duplicate_profile_id;
         } else {
-            console.error('Profile error:', profileText);
             return res.status(500).json({ error: 'Could not create profile' });
         }
 
-        // Step 2: Add profile to list
         const listRes = await fetch(`https://a.klaviyo.com/api/lists/${KLAVIYO_LIST_ID}/relationships/profiles/`, {
             method: 'POST',
             headers: {
