@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Attribution Discrepancy Calculator — Kuma Agency</title>
+  <link rel="icon" href="https://oharejohnpatrick-creator.github.io/ALL/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#060d1a;
+      --surface:#0b1525;
+      --surface2:#111e30;
+      --border:rgba(255,255,255,0.07);
+      --muted:#64748b;
+      --text:#e2eaf4;
+      --accent:#2563eb;
+      --accent2:#1d4ed8;
+      --success:#10b981;
+      --danger:#ef4444;
+      --warning:#f59e0b;
+      --google:#1a73e8;
+      --meta:#7c3aed;
+      --tiktok:#0f172a;
+      --pinterest:#ef4444;
+      --microsoft:#0ea5e9;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:'DM Sans',system-ui,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    /* ── PAGE SHELL ── */
+    .page{max-width:1080px;margin:0 auto;padding:32px 20px 64px}
+
+    /* ── TOP HEADER BAR ── */
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:18px 28px;
+      background:var(--surface);
+      border-bottom:1px solid var(--border);
+      border-radius:18px 18px 0 0;
+    }
+    .topbar img{height:40px}
+    .badge{
+      background:rgba(37,99,235,0.15);
+      color:#60a5fa;
+      font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+      padding:5px 10px;border-radius:6px;border:1px solid rgba(96,165,250,0.2);
+    }
+
+    /* ── HERO / EMAIL GATE ── */
+    .hero{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-top:none;
+      border-radius:0 0 18px 18px;
+      padding:52px 40px 56px;
+      text-align:center;
+    }
+    .hero h1{
+      font-size:clamp(26px,4vw,40px);
+      font-weight:700;
+      color:#f8fafc;
+      line-height:1.2;
+      margin-bottom:12px;
+      letter-spacing:-.02em;
+    }
+    .hero h1 em{
+      font-style:normal;
+      background:linear-gradient(90deg,#60a5fa,#a78bfa);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+    .hero p{color:var(--muted);font-size:16px;max-width:520px;margin:0 auto 36px;line-height:1.6}
+
+    .gate-box{
+      max-width:500px;margin:0 auto;
+      background:var(--surface2);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:28px;
+    }
+    .gate-box .bullets{
+      text-align:left;margin-bottom:22px;display:flex;flex-direction:column;gap:8px;
+    }
+    .gate-box .bullets li{
+      list-style:none;display:flex;align-items:center;gap:8px;
+      font-size:14px;color:#94a3b8;
+    }
+    .gate-box .bullets li::before{content:'✓';color:var(--success);font-weight:700}
+    .gate-form{display:flex;flex-direction:column;gap:10px}
+    .gate-form input{
+      padding:14px 16px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.1);
+      background:rgba(255,255,255,0.04);
+      color:#f8fafc;
+      font-size:15px;
+      font-family:inherit;
+      outline:none;
+      transition:border .2s;
+    }
+    .gate-form input:focus{border-color:rgba(96,165,250,0.5)}
+    .gate-form input::placeholder{color:#475569}
+    .gate-form button{
+      padding:14px;
+      border-radius:10px;
+      border:none;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:#fff;
+      font-size:15px;font-weight:700;font-family:inherit;
+      cursor:pointer;
+      transition:opacity .2s,transform .1s;
+    }
+    .gate-form button:hover{opacity:.9}
+    .gate-form button:active{transform:scale(.99)}
+    .gate-form button:disabled{opacity:.6;cursor:not-allowed}
+    .gate-note{font-size:12px;color:#475569;margin-top:8px;text-align:center}
+    .email-error{color:var(--danger);font-size:13px;margin-top:8px;text-align:center}
+
+    /* ── CALCULATOR SHELL ── */
+    .calculator{display:none;margin-top:28px}
+    .calc-wrap{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:18px;
+      overflow:hidden;
+    }
+    .calc-header{
+      padding:22px 28px;
+      border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;
+      flex-wrap:wrap;gap:10px;
+    }
+    .calc-header h2{font-size:18px;font-weight:700;color:#f8fafc}
+    .calc-header p{font-size:13px;color:var(--muted);margin-top:2px}
+    .calc-body{padding:28px}
+
+    /* ── PLATFORM TOGGLES ── */
+    .section-label{font-size:13px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+    .platform-select{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+    .ptoggle{
+      display:flex;align-items:center;gap:8px;
+      background:var(--surface2);
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:8px 14px;
+      cursor:pointer;
+      transition:border .2s,background .2s;
+      font-size:14px;color:var(--text);
+      user-select:none;
+    }
+    .ptoggle:has(input:checked){
+      border-color:rgba(96,165,250,0.4);
+      background:rgba(37,99,235,0.08);
+    }
+    .ptoggle input{accent-color:var(--accent);width:15px;height:15px;cursor:pointer}
+
+    /* ── INPUT ROWS ── */
+    .inputs-grid{display:flex;flex-direction:column;gap:16px;margin-bottom:28px}
+    .input-row{
+      background:var(--surface2);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:16px 20px;
+    }
+    .input-row-head{
+      display:flex;align-items:center;gap:10px;margin-bottom:14px;
+    }
+    .p-dot{
+      width:10px;height:10px;border-radius:50%;flex-shrink:0;
+    }
+    .input-row-head span{font-weight:600;font-size:14px;color:#f1f5f9}
+    .input-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .input-field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500}
+    .input-field input{
+      width:100%;
+      padding:11px 14px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.04);
+      color:#f8fafc;
+      font-size:15px;font-family:'DM Mono',monospace;
+      outline:none;transition:border .2s;
+    }
+    .input-field input:focus{border-color:rgba(96,165,250,0.4)}
+    .input-helper{font-size:11px;color:#475569;margin-top:5px}
+
+    /* ── SUMMARY CARDS ── */
+    .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+    .s-card{
+      background:var(--surface2);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:16px 18px;
+    }
+    .s-card .s-label{font-size:12px;color:var(--muted);font-weight:500;margin-bottom:8px}
+    .s-card .s-value{font-size:22px;font-weight:700;color:#f8fafc;font-family:'DM Mono',monospace}
+    .s-card .s-sub{font-size:12px;color:var(--muted);margin-top:4px}
+    .s-card.red{border-color:rgba(239,68,68,0.25);background:rgba(239,68,68,0.06)}
+    .s-card.red .s-value{color:#fca5a5}
+    .s-card.green{border-color:rgba(16,185,129,0.25);background:rgba(16,185,129,0.06)}
+    .s-card.green .s-value{color:#6ee7b7}
+
+    /* ── PLATFORM BREAKDOWN CARDS ── */
+    .breakdown-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+    .b-card{
+      background:var(--surface2);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:16px 18px;
+    }
+    .b-card-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+    .b-icon{
+      width:32px;height:32px;border-radius:8px;
+      display:grid;place-items:center;
+      font-weight:800;font-size:13px;color:#fff;
+      flex-shrink:0;
+    }
+    .b-card-head .b-name{font-weight:700;font-size:14px;color:#f1f5f9}
+    .b-stat{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+    .b-stat .b-stat-label{font-size:12px;color:var(--muted)}
+    .b-stat .b-stat-val{font-size:13px;font-weight:600;font-family:'DM Mono',monospace;color:#e2eaf4}
+    .b-error-row{
+      display:flex;justify-content:space-between;align-items:center;
+      margin-top:10px;padding-top:10px;border-top:1px solid var(--border);
+    }
+    .b-error-row .b-err-pct{font-size:15px;font-weight:700;font-family:'DM Mono',monospace}
+    .b-tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.05em}
+    .tag-over{color:#fca5a5;background:rgba(239,68,68,0.12)}
+    .tag-under{color:#6ee7b7;background:rgba(16,185,129,0.12)}
+    .tag-matched{color:#94a3b8;background:rgba(148,163,184,0.1)}
+    .b-bar{height:6px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;margin-top:10px;display:flex}
+    .b-bar-rep{height:100%;border-radius:4px 0 0 4px}
+    .b-bar-shop{height:100%;background:rgba(255,255,255,0.15);border-radius:0 4px 4px 0}
+
+    /* ── DIVIDER ── */
+    .divider{border:none;border-top:1px solid var(--border);margin:0 0 24px}
+
+    /* ── RECOMMENDATIONS ── */
+    .recs{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+    .rec{
+      display:flex;align-items:flex-start;gap:12px;
+      background:rgba(245,158,11,0.06);
+      border:1px solid rgba(245,158,11,0.2);
+      border-radius:10px;
+      padding:14px 16px;
+      font-size:14px;color:#fcd34d;
+      line-height:1.5;
+    }
+    .rec.healthy{
+      background:rgba(16,185,129,0.06);
+      border-color:rgba(16,185,129,0.2);
+      color:#6ee7b7;
+    }
+    .rec-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+    .rec a{
+      display:inline-block;margin-top:6px;
+      color:#60a5fa;font-weight:600;font-size:13px;text-decoration:none;
+    }
+    .rec a:hover{text-decoration:underline}
+
+    /* ── FORMULAS ── */
+    .formulas-toggle{
+      background:none;border:1px solid var(--border);
+      color:var(--muted);font-size:13px;font-family:inherit;
+      padding:8px 14px;border-radius:8px;cursor:pointer;
+      transition:border .2s,color .2s;
+    }
+    .formulas-toggle:hover{border-color:rgba(255,255,255,0.2);color:var(--text)}
+    .formulas-body{
+      margin-top:12px;
+      background:var(--surface2);
+      border:1px solid var(--border);
+      border-radius:10px;
+      padding:16px 20px;
+    }
+    .formulas-body li{
+      font-size:13px;color:#94a3b8;margin-bottom:8px;
+      font-family:'DM Mono',monospace;line-height:1.5;
+    }
+
+    @media(max-width:860px){
+      .summary-grid{grid-template-columns:repeat(2,1fr)}
+      .breakdown-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media(max-width:540px){
+      .summary-grid{grid-template-columns:1fr 1fr}
+      .breakdown-grid{grid-template-columns:1fr}
+      .input-cols{grid-template-columns:1fr}
+      .hero{padding:36px 20px 40px}
+      .calc-body{padding:20px}
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <img src="https://oharejohnpatrick-creator.github.io/ALL/logo.png" alt="Kuma Agency">
+    <span class="badge">Free Tool</span>
+  </div>
+
+  <!-- HERO / EMAIL GATE -->
+  <div class="hero" id="heroGate">
+    <h1>Find out which ad platforms<br>are <em>lying to you</em></h1>
+    <p>Enter your email to access the free Attribution Discrepancy Calculator — used by ecommerce brands to find their real numbers.</p>
+
+    <div class="gate-box">
+      <ul class="bullets">
+        <li>Per-platform revenue vs Shopify comparison</li>
+        <li>Real-time error rate per channel</li>
+        <li>Instant recommendations based on your data</li>
+      </ul>
+      <form class="gate-form" id="subscribeForm">
+        <input id="emailInput" type="email" placeholder="Enter your work email" required>
+        <button type="submit" id="subscribeBtn">Get Free Access</button>
+      </form>
+      <div class="email-error" id="emailError" style="display:none"></div>
+      <p class="gate-note">No spam, ever.</p>
+    </div>
+  </div>
+
+  <!-- CALCULATOR -->
+  <div class="calculator" id="calculator">
+    <div class="calc-wrap">
+      <div class="calc-header">
+        <div>
+          <h2>Attribution Discrepancy Calculator</h2>
+          <p>Compare what your ad platforms claim vs what Shopify actually recorded — per channel.</p>
+        </div>
+      </div>
+      <div class="calc-body">
+
+        <!-- Platform selector -->
+        <div class="section-label">Which platforms are you running ads on?</div>
+        <div class="platform-select" id="platformSelect">
+          <label class="ptoggle"><input type="checkbox" data-key="google" checked> Google Ads</label>
+          <label class="ptoggle"><input type="checkbox" data-key="meta" checked> Meta Ads</label>
+          <label class="ptoggle"><input type="checkbox" data-key="tiktok" checked> TikTok Ads</label>
+          <label class="ptoggle"><input type="checkbox" data-key="pinterest"> Pinterest Ads</label>
+          <label class="ptoggle"><input type="checkbox" data-key="microsoft"> Microsoft / Bing Ads</label>
+        </div>
+
+        <!-- Input rows -->
+        <div class="section-label">Enter your revenue figures</div>
+        <div class="inputs-grid" id="inputsGrid"></div>
+
+        <!-- Summary cards -->
+        <div class="summary-grid">
+          <div class="s-card" id="cardTotal">
+            <div class="s-label">Total platform-reported</div>
+            <div class="s-value" id="totalReported">$0</div>
+            <div class="s-sub">Sum of all platforms</div>
+          </div>
+          <div class="s-card" id="cardShopify">
+            <div class="s-label">Total Shopify-attributed</div>
+            <div class="s-value" id="totalShopify">$0</div>
+            <div class="s-sub">Ground truth</div>
+          </div>
+          <div class="s-card" id="cardGap">
+            <div class="s-label">Total discrepancy</div>
+            <div class="s-value" id="totalGap">$0</div>
+            <div class="s-sub">Platform − Shopify</div>
+          </div>
+          <div class="s-card" id="cardBlended">
+            <div class="s-label">Blended error rate</div>
+            <div class="s-value" id="blendedError">0%</div>
+            <div class="s-sub" id="blendedLabel">—</div>
+          </div>
+        </div>
+
+        <!-- Per-platform breakdown -->
+        <div class="section-label">Per-platform breakdown</div>
+        <div class="breakdown-grid" id="breakdownGrid"></div>
+
+        <hr class="divider">
+
+        <!-- Recommendations -->
+        <div class="section-label">Recommendations</div>
+        <div class="recs" id="recs"></div>
+
+        <!-- Formulas -->
+        <button class="formulas-toggle" id="toggleFormulas">Show formulas ↓</button>
+        <div id="formulasBox" style="display:none">
+          <div class="formulas-body">
+            <ul>
+              <li>Dollar discrepancy = Platform reported − Shopify attributed</li>
+              <li>Error rate % = ((Platform reported − Shopify attributed) / Shopify attributed) × 100</li>
+              <li>Blended error rate = ((Σ platform reported − Σ Shopify attributed) / Σ Shopify attributed) × 100</li>
+              <li>Matched = error rate between −3% and +3%</li>
+              <li>Over-reporting = error rate &gt; 3%</li>
+              <li>Under-reporting = error rate &lt; −3%</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const PLATFORMS = {
+    google:    {label:'Google',    color:'#1a73e8'},
+    meta:      {label:'Meta',      color:'#7c3aed'},
+    tiktok:    {label:'TikTok',    color:'#0f172a'},
+    pinterest: {label:'Pinterest', color:'#ef4444'},
+    microsoft: {label:'Microsoft', color:'#0ea5e9'},
+  };
+
+  let active = ['google','meta','tiktok'];
+
+  const $  = id => document.getElementById(id);
+  const fmt = n => '$' + Math.abs(Number(n)||0).toLocaleString('en-US',{maximumFractionDigits:0});
+  const fmtSigned = n => (n<0?'-':'')+fmt(n);
+  const pct = n => (Number(n)||0).toFixed(1)+'%';
+
+  function tagClass(err){
+    if(err > 3) return 'tag-over';
+    if(err < -3) return 'tag-under';
+    return 'tag-matched';
+  }
+  function tagLabel(err){
+    if(err > 3) return 'Over-reporting';
+    if(err < -3) return 'Under-reporting';
+    return 'Matched';
+  }
+
+  function renderInputs(){
+    const grid = $('inputsGrid'); grid.innerHTML='';
+    active.forEach(key => {
+      const p = PLATFORMS[key];
+      const row = document.createElement('div'); row.className='input-row';
+      row.innerHTML = `
+        <div class="input-row-head">
+          <div class="p-dot" style="background:${p.color}"></div>
+          <span>${p.label} Ads</span>
+        </div>
+        <div class="input-cols">
+          <div class="input-field">
+            <label>${p.label} reported revenue ($)</label>
+            <input type="number" class="inp-rep" data-key="${key}" value="" min="0" placeholder="0">
+          </div>
+          <div class="input-field">
+            <label>${p.label} Shopify-attributed revenue ($)</label>
+            <input type="number" class="inp-shop" data-key="${key}" value="" min="0" placeholder="0">
+            <div class="input-helper">Shopify → Analytics → Sales by traffic source</div>
+          </div>
+        </div>
+      `;
+      grid.appendChild(row);
+    });
+    document.querySelectorAll('.inp-rep,.inp-shop').forEach(i => i.addEventListener('input', compute));
+    compute();
+  }
+
+  function compute(){
+    const stats = {};
+    let totRep=0, totShop=0;
+
+    active.forEach(key => {
+      const rep  = Number(document.querySelector(`.inp-rep[data-key="${key}"]`)?.value) || 0;
+      const shop = Number(document.querySelector(`.inp-shop[data-key="${key}"]`)?.value) || 0;
+      const gap  = rep - shop;
+      const err  = shop !== 0 ? (gap / shop) * 100 : (rep > 0 ? 100 : 0);
+      stats[key] = {rep, shop, gap, err, label: tagLabel(err)};
+      totRep += rep; totShop += shop;
+    });
+
+    const totGap     = totRep - totShop;
+    const blendedErr = totShop !== 0 ? (totGap / totShop) * 100 : 0;
+
+    // Summary cards
+    $('totalReported').textContent = fmt(totRep);
+    $('totalShopify').textContent  = fmt(totShop);
+    $('totalGap').textContent      = fmtSigned(totGap);
+    $('blendedError').textContent  = pct(blendedErr);
+    $('blendedLabel').textContent  = tagLabel(blendedErr);
+
+    const gapCard = $('cardGap');
+    gapCard.classList.remove('red','green');
+    if(totGap > 0) gapCard.classList.add('red');
+    else if(totGap < 0) gapCard.classList.add('green');
+
+    const blCard = $('cardBlended');
+    blCard.classList.remove('red','green');
+    if(blendedErr > 3) blCard.classList.add('red');
+    else if(blendedErr < -3) blCard.classList.add('green');
+
+    // Breakdown cards
+    const bg = $('breakdownGrid'); bg.innerHTML='';
+    active.forEach(key => {
+      const s = stats[key];
+      const p = PLATFORMS[key];
+      const maxv = Math.max(1, s.rep, s.shop);
+      const repW  = Math.round((s.rep  / maxv) * 100);
+      const shopW = Math.round((s.shop / maxv) * 100);
+      const errColor = s.err > 3 ? '#fca5a5' : s.err < -3 ? '#6ee7b7' : '#94a3b8';
+      const card = document.createElement('div'); card.className='b-card';
+      card.innerHTML = `
+        <div class="b-card-head">
+          <div class="b-icon" style="background:${p.color}">${p.label.charAt(0)}</div>
+          <span class="b-name">${p.label}</span>
+        </div>
+        <div class="b-stat"><span class="b-stat-label">Platform reported</span><span class="b-stat-val">${fmt(s.rep)}</span></div>
+        <div class="b-stat"><span class="b-stat-label">Shopify attributed</span><span class="b-stat-val">${fmt(s.shop)}</span></div>
+        <div class="b-stat"><span class="b-stat-label">Discrepancy</span><span class="b-stat-val" style="color:${errColor}">${fmtSigned(s.gap)}</span></div>
+        <div class="b-error-row">
+          <span class="b-err-pct" style="color:${errColor}">${pct(s.err)}</span>
+          <span class="b-tag ${tagClass(s.err)}">${s.label}</span>
+        </div>
+        <div class="b-bar">
+          <div class="b-bar-rep" style="width:${repW}%;background:${p.color};opacity:.7"></div>
+          <div class="b-bar-shop" style="width:${shopW}%"></div>
+        </div>
+      `;
+      bg.appendChild(card);
+    });
+
+    // Recommendations
+    const recsEl = $('recs'); recsEl.innerHTML='';
+    let anyRec = false;
+
+    active.forEach(key => {
+      const s = stats[key];
+      if(s.err > 50){
+        addRec(recsEl, `⚠️`, `<strong>${PLATFORMS[key].label}</strong> is over-reporting by more than 50%. You may be scaling a losing campaign based on bad data.<br><a href="https://kuma-agency.moxieapp.com/public/discovery-call">Book a Free Audit →</a>`);
+        anyRec=true;
+      } else if(s.err > 3){
+        addRec(recsEl, `⚠️`, `<strong>${PLATFORMS[key].label}</strong> is over-reporting by ${pct(s.err)}. You may be making spend decisions based on inflated data.<br><a href="https://kuma-agency.moxieapp.com/public/discovery-call">Book a Free Audit →</a>`);
+        anyRec=true;
+      }
+    });
+
+    if(blendedErr > 30){
+      addRec(recsEl, `🚨`, `Your overall attribution is <strong>significantly inflated</strong>. Your real performance is likely much lower than your dashboards suggest.<br><a href="https://kuma-agency.moxieapp.com/public/discovery-call">Book a Free Audit →</a>`);
+      anyRec=true;
+    } else if(blendedErr > 3){
+      addRec(recsEl, `⚠️`, `Your overall attribution is inflated. Your real performance is likely lower than your dashboards suggest.<br><a href="https://kuma-agency.moxieapp.com/public/discovery-call">Book a Free Audit →</a>`);
+      anyRec=true;
+    }
+
+    if(totGap > 10000){
+      addRec(recsEl, `💸`, `You have a <strong>${fmt(totGap)}</strong> attribution blind spot. Book a free audit to find where your budget is actually going.<br><a href="https://kuma-agency.moxieapp.com/public/discovery-call">Book a Free Audit →</a>`);
+      anyRec=true;
+    }
+
+    if(!anyRec && active.length > 0 && (totRep > 0 || totShop > 0)){
+      addRec(recsEl, `✅`, `Your attribution looks healthy. Your platform data is closely aligned with Shopify.`, true);
+    } else if(!anyRec){
+      addRec(recsEl, `👆`, `Enter your revenue figures above to see your attribution analysis.`, true);
+    }
+  }
+
+  function addRec(container, icon, html, healthy=false){
+    const d = document.createElement('div');
+    d.className = 'rec' + (healthy?' healthy':'');
+    d.innerHTML = `<span class="rec-icon">${icon}</span><div>${html}</div>`;
+    container.appendChild(d);
+  }
+
+  // Platform checkbox toggles
+  $('platformSelect').querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', e => {
+      const key = e.target.dataset.key;
+      if(e.target.checked){ if(!active.includes(key)) active.push(key); }
+      else { active = active.filter(x => x !== key); }
+      renderInputs();
+    });
+  });
+
+  // Email gate
+  $('subscribeForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = $('subscribeBtn');
+    const err = $('emailError');
+    err.style.display='none';
+    btn.disabled=true; btn.textContent='Sending...';
+    try{
+      const res = await fetch('https://calculator-gilt-chi-65.vercel.app/api/subscribe',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({email: $('emailInput').value})
+      });
+      if(res.ok){
+        $('heroGate').style.display='none';
+        $('calculator').style.display='block';
+        window.scrollTo({top:0,behavior:'smooth'});
+        renderInputs();
+      } else {
+        err.textContent='Something went wrong, please try again.';
+        err.style.display='block';
+      }
+    } catch(ex){
+      err.textContent='Something went wrong, please try again.';
+      err.style.display='block';
+    } finally {
+      btn.disabled=false; btn.textContent='Get Free Access';
+    }
+  });
+
+  // Formulas toggle
+  $('toggleFormulas').addEventListener('click', () => {
+    const box = $('formulasBox');
+    const open = box.style.display==='none';
+    box.style.display = open ? 'block' : 'none';
+    $('toggleFormulas').textContent = open ? 'Hide formulas ↑' : 'Show formulas ↓';
+  });
+
+  // Init
+  renderInputs();
+</script>
+</body>
+</html>
