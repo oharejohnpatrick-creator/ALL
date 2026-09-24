@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Three routes to $100,000 a month for Pouch, modelled on actual 2026 spend and order history. Working draft.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Pouch Growth Model">
+<meta property="og:description" content="Three routes to $100,000 a month, modelled on actual 2026 spend and order history.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232a78d6'/%3E%3Cpath d='M6 23L12 17L17 20L26 9' stroke='white' stroke-width='2.75' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+/* baseline reset, previously supplied by the artifact host */
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<title>Pouch Growth Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  color-scheme: light;
+  --paper:#f4f6f8;
+  --surface:#ffffff;
+  --surface-2:#eef1f4;
+  --ink:#131820;
+  --ink-2:#56616f;
+  --ink-3:#8a95a3;
+  --rule:#dfe4ea;
+  --rule-strong:#c4ccd6;
+  --s1:#2a78d6;
+  --s2:#eb6834;
+  --s3:#1baf7a;
+  --neutral-mark:#b9c3cf;
+  --good:#12684a;
+  --warn:#8a5600;
+  --bad:#b02a20;
+  --good-bg:#e4f2eb;
+  --warn-bg:#f7eedd;
+  --bad-bg:#f8e6e4;
+  --shadow:0 1px 2px rgba(19,24,32,.05), 0 8px 24px -12px rgba(19,24,32,.14);
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --paper:#111418; --surface:#191d23; --surface-2:#22272e;
+    --ink:#eef1f5; --ink-2:#a3aeba; --ink-3:#727d8a;
+    --rule:#2a3038; --rule-strong:#3b434d;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+    --neutral-mark:#4c5661;
+    --good:#4fc78f; --warn:#d8a244; --bad:#ef7a70;
+    --good-bg:#16302a; --warn-bg:#2f2718; --bad-bg:#331d1c;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --paper:#111418; --surface:#191d23; --surface-2:#22272e;
+  --ink:#eef1f5; --ink-2:#a3aeba; --ink-3:#727d8a;
+  --rule:#2a3038; --rule-strong:#3b434d;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70;
+  --neutral-mark:#4c5661;
+  --good:#4fc78f; --warn:#d8a244; --bad:#ef7a70;
+  --good-bg:#16302a; --warn-bg:#2f2718; --bad-bg:#331d1c;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:36px 72px;display:flex;flex-direction:column;gap:34px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.018em;line-height:1.14}
+h1{font-size:clamp(28px,4.4vw,40px);font-weight:700}
+h2{font-size:clamp(19px,2.4vw,23px);font-weight:600}
+h3{font-size:15px;font-weight:600;letter-spacing:-.008em}
+p{margin:0}
+.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--f-mono);font-size:11px;font-weight:500;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+
+header{display:flex;flex-direction:column;gap:14px;border-bottom:1px solid var(--rule);padding-bottom:26px}
+.head-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.stamp{display:inline-flex;align-items:center;font-family:var(--f-mono);font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--warn);background:var(--warn-bg);border:1px solid var(--warn);padding:5px 10px;border-radius:3px;white-space:nowrap}
+.lede{max-width:64ch;color:var(--ink-2);font-size:16px}
+.lede strong{color:var(--ink);font-weight:600}
+
+.thesis{background:var(--surface);border:1px solid var(--rule);border-radius:6px;box-shadow:var(--shadow);overflow:hidden;display:grid;grid-template-columns:1.4fr 1fr}
+.thesis-main{padding:26px 28px;display:flex;flex-direction:column;gap:13px}
+.thesis h2{font-size:clamp(20px,2.7vw,27px)}
+.thesis p{color:var(--ink-2);max-width:58ch}
+.proof{background:var(--surface-2);border-left:1px solid var(--rule);padding:26px 28px;display:flex;flex-direction:column;justify-content:center;gap:9px}
+.proof-row{display:flex;flex-direction:column;gap:3px}
+.proof-fig{font-family:var(--f-mono);font-size:29px;font-weight:600;letter-spacing:-.02em;line-height:1}
+.proof-fig.bad{color:var(--bad)}
+.proof-cap{font-size:13px;color:var(--ink-2);line-height:1.45}
+.proof-vs{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+
+.controls{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:20px 22px;display:flex;flex-direction:column;gap:16px}
+.ctrl-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.ctrl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(142px,1fr));gap:14px 18px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:12px;color:var(--ink-2);font-weight:500;line-height:1.3}
+.field .hint{font-size:11px;color:var(--ink-3);font-family:var(--f-mono)}
+.field input[type=number]{font-family:var(--f-mono);font-size:14px;font-variant-numeric:tabular-nums;background:var(--surface);color:var(--ink);border:1px solid var(--rule-strong);border-radius:4px;padding:7px 9px;width:100%}
+.field input[type=number]:focus-visible{outline:2px solid var(--s1);outline-offset:1px;border-color:var(--s1)}
+button.reset{font-family:var(--f-body);font-size:12px;font-weight:500;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--rule-strong);border-radius:4px;padding:6px 11px;cursor:pointer}
+button.reset:hover{color:var(--ink);border-color:var(--ink-3)}
+button.reset:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+
+.scen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.scen{background:var(--surface);border:1px solid var(--rule);border-radius:6px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+.scen-top{padding:16px 18px 14px;display:flex;flex-direction:column;gap:4px;border-bottom:1px solid var(--rule)}
+.scen-tag{display:flex;align-items:center;gap:8px}
+.swatch{width:11px;height:11px;border-radius:2px;flex:none}
+.scen-name{font-family:var(--f-display);font-size:17px;font-weight:600;letter-spacing:-.01em}
+.scen-sub{font-size:12.5px;color:var(--ink-2);line-height:1.42}
+.lever{padding:14px 18px;border-bottom:1px solid var(--rule);display:flex;flex-direction:column;gap:7px}
+.lever + .lever{border-top:none}
+.lv-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.lv-label{font-size:11.5px;color:var(--ink-2);line-height:1.3}
+.lv-val{font-family:var(--f-mono);font-size:20px;font-weight:600;letter-spacing:-.02em}
+input[type=range]{width:100%;accent-color:var(--ink-3);height:18px;margin:0;cursor:pointer}
+input[type=range]:focus-visible{outline:2px solid var(--s1);outline-offset:3px}
+.lv-foot{font-family:var(--f-mono);font-size:10.5px;color:var(--ink-3);display:flex;justify-content:space-between;gap:8px}
+.stats{padding:6px 18px 14px;display:flex;flex-direction:column}
+.stat{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px dotted var(--rule)}
+.stat:last-child{border-bottom:none}
+.stat-k{font-size:12.5px;color:var(--ink-2)}
+.stat-v{font-family:var(--f-mono);font-size:14px;font-weight:500;font-variant-numeric:tabular-nums}
+.verdict{margin:0 18px 18px;padding:10px 12px;border-radius:4px;display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.42}
+.verdict .glyph{font-family:var(--f-mono);font-weight:600;flex:none;line-height:1.3}
+.v-bad{background:var(--bad-bg);color:var(--bad)}
+.v-warn{background:var(--warn-bg);color:var(--warn)}
+.v-good{background:var(--good-bg);color:var(--good)}
+
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:6px;box-shadow:var(--shadow);padding:24px 26px;display:flex;flex-direction:column;gap:18px}
+.panel-head{display:flex;flex-direction:column;gap:5px}
+.panel-head p{color:var(--ink-2);font-size:13.5px;max-width:72ch}
+
+.chart-shell{position:relative}
+svg.chart{display:block;width:100%;height:auto;overflow:visible}
+.gridline{stroke:var(--rule);stroke-width:1}
+.axis-text{fill:var(--ink-3);font-family:var(--f-mono);font-size:11px}
+.axis-text.strong{fill:var(--ink-2)}
+.target-line{stroke:var(--ink-3);stroke-width:1.5;stroke-dasharray:5 4}
+.serie{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.dot-ring{stroke:var(--surface);stroke-width:2}
+.dlabel{font-family:var(--f-mono);font-size:11.5px;font-weight:600}
+.crosshair{stroke:var(--rule-strong);stroke-width:1}
+.tip{position:absolute;pointer-events:none;z-index:5;background:var(--surface);border:1px solid var(--rule-strong);border-radius:5px;box-shadow:var(--shadow);padding:9px 11px;min-width:212px;font-size:12px;transform:translate(-50%,-112%)}
+.tip-title{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
+.tip-row{display:flex;align-items:center;gap:7px;padding:2px 0}
+.tip-row .nm{color:var(--ink-2);flex:1;font-size:11.5px}
+.tip-row .sp{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.tip-row .vl{font-family:var(--f-mono);font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;min-width:58px;text-align:right}
+.legend{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center}
+.lg{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2)}
+.lg .bar{width:16px;height:2px;border-radius:1px}
+.lg .blk{width:14px;height:9px;border-radius:2px}
+.lg .dash{width:16px;height:0;border-top:1.5px dashed var(--ink-3)}
+
+.sm-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.sm .sm-cap{font-size:12px;color:var(--ink-2);margin:2px 0 10px;line-height:1.4}
+
+details.tbl{border-top:1px solid var(--rule);padding-top:14px}
+details.tbl summary{cursor:pointer;font-size:12.5px;color:var(--ink-2);font-weight:500;list-style:none;display:flex;align-items:center;gap:7px}
+details.tbl summary::-webkit-details-marker{display:none}
+details.tbl summary::before{content:"+";font-family:var(--f-mono);color:var(--ink-3)}
+details.tbl[open] summary::before{content:"\2013"}
+details.tbl summary:focus-visible{outline:2px solid var(--s1);outline-offset:3px;border-radius:2px}
+.tbl-scroll{overflow-x:auto;margin-top:14px}
+table{border-collapse:collapse;width:100%;min-width:660px;font-size:12.5px}
+th,td{text-align:right;padding:7px 10px;border-bottom:1px solid var(--rule);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+thead tr:last-child th{border-bottom:1px solid var(--rule-strong)}
+thead th.grp{text-align:center;border-bottom:none;padding-bottom:2px}
+tbody td{font-family:var(--f-mono);font-variant-numeric:tabular-nums;color:var(--ink-2)}
+tbody td:first-child{color:var(--ink);font-family:var(--f-body)}
+tbody tr.hit td{background:var(--surface-2);color:var(--ink)}
+
+.solve{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--s1);border-radius:6px;padding:22px 26px;display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center;box-shadow:var(--shadow)}
+.solve-fig{display:flex;flex-direction:column;gap:3px}
+.solve-fig .v{font-family:var(--f-mono);font-size:38px;font-weight:600;letter-spacing:-.025em;line-height:1;color:var(--s1)}
+.solve-fig .l{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.solve-body{display:flex;flex-direction:column;gap:10px}
+.solve p{color:var(--ink-2);font-size:14px;max-width:70ch}
+.solve p strong{color:var(--ink);font-weight:600}
+
+.assump{display:grid;grid-template-columns:repeat(auto-fit,minmax(252px,1fr));gap:0 28px}
+.arow{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px dotted var(--rule);align-items:baseline}
+.arow .a-k{font-size:13px;color:var(--ink)}
+.arow .a-s{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.35}
+.arow .a-v{font-family:var(--f-mono);font-size:13px;color:var(--ink-2);white-space:nowrap;font-variant-numeric:tabular-nums}
+.caveats ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:9px}
+.caveats li{color:var(--ink-2);font-size:13.5px;line-height:1.5}
+.caveats li strong{color:var(--ink);font-weight:600}
+footer{border-top:1px solid var(--rule);padding-top:20px;color:var(--ink-3);font-size:12px;display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:space-between}
+
+@media (max-width:920px){
+  .thesis{grid-template-columns:1fr}
+  .proof{border-left:none;border-top:1px solid var(--rule)}
+  .scen-grid{grid-template-columns:1fr}
+  .sm-grid{grid-template-columns:1fr}
+  .solve{grid-template-columns:1fr;gap:14px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<style>
+@media print{
+  :root{
+    --paper:#ffffff; --surface:#ffffff; --surface-2:#f4f6f8;
+    --ink:#131820; --ink-2:#3d4650; --ink-3:#6b7480;
+    --rule:#d5dbe2; --rule-strong:#b3bcc6;
+    --shadow:none;
+    color-scheme:light;
+  }
+  .wrap{max-width:none;padding-block:0 0}
+  .panel,.scen,.thesis,.controls,.solve{box-shadow:none;break-inside:avoid;page-break-inside:avoid}
+  .scen-grid,.sm-grid{break-inside:avoid;page-break-inside:avoid}
+  button.reset{display:none}
+  details.tbl{display:none}
+  a[href]:after{content:""}
+}
+</style>
+</head>
+<body>
+<noscript>
+  <div style="max-width:1120px;margin:0 auto;padding:20px;">
+    <p style="background:#f7eedd;border:1px solid #8a5600;color:#8a5600;border-radius:5px;padding:12px 14px;font:14px/1.5 system-ui,sans-serif;">
+      This model is calculated in the browser. Please enable JavaScript to see the scenarios, charts and figures.
+    </p>
+  </div>
+</noscript>
+<div class="wrap">
+
+  <header>
+    <div class="head-top">
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <span class="eyebrow">Kuma Agency &middot; Pouch &middot; Paid media</span>
+        <h1>Pouch Growth Model</h1>
+      </div>
+      <span class="stamp">Working draft &middot; v1</span>
+    </div>
+    <p class="lede">Three routes to <strong>$100,000 a month</strong> in total revenue, built on Pouch's actual 2026 spend and order history. Every route is the same four inputs: <strong>spend</strong>, <strong>CAC</strong>, <strong>average order value</strong>, and <strong>orders per customer</strong>. Move the levers and the whole model moves with them.</p>
+  </header>
+
+  <section class="thesis">
+    <div class="thesis-main">
+      <span class="eyebrow">The finding</span>
+      <h2>$100K a month is not an acquisition problem.</h2>
+      <p>At a $93 average order value, $100K means roughly <span class="num">1,075</span> orders a month. August delivered <span class="num">281</span>. Buying that many <em>first</em> orders outright would cost more than the revenue they produce, so no spend plan alone reaches the target.</p>
+      <p>What closes the gap is <strong>how many times a customer comes back</strong>. That is the model's real lever, it compounds while spend does not, and it is the one Kuma does not control.</p>
+    </div>
+    <div class="proof">
+      <span class="eyebrow">If nobody repeats</span>
+      <div class="proof-row">
+        <span class="proof-fig num" id="proofSpend">$123,656</span>
+        <span class="proof-cap">of paid media to buy 1,075 first orders at a $115 CAC</span>
+      </div>
+      <span class="proof-vs">to produce</span>
+      <div class="proof-row">
+        <span class="proof-fig num bad">$100,000</span>
+        <span class="proof-cap">of revenue. A 0.81x return before a single dollar of product cost.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="controls">
+    <div class="ctrl-head">
+      <div>
+        <h2>Shared assumptions</h2>
+        <p style="color:var(--ink-2);font-size:13px;margin-top:3px">Applied to all three routes. Defaults are August 2026 actuals and Pouch's own stated planning figures.</p>
+      </div>
+      <button class="reset" id="resetBtn" type="button">Reset to defaults</button>
+    </div>
+    <div class="ctrl-grid">
+      <div class="field"><label for="spend0">Starting paid spend</label>
+        <input type="number" id="spend0" value="15275" min="1000" max="200000" step="250"><span class="hint">$ &middot; Aug 2026 actual</span></div>
+      <div class="field"><label for="cac">Blended CAC</label>
+        <input type="number" id="cac" value="115" min="30" max="400" step="1"><span class="hint">$ &middot; spend / new custs</span></div>
+      <div class="field"><label for="aov">Average order value</label>
+        <input type="number" id="aov" value="93" min="20" max="300" step="1"><span class="hint">$ &middot; Aug blended</span></div>
+      <div class="field"><label for="gp">Gross profit / order</label>
+        <input type="number" id="gp" value="37.76" min="1" max="200" step="0.01"><span class="hint">$ &middot; Pouch CAC doc</span></div>
+      <div class="field"><label for="fixed">Fixed marketing / month</label>
+        <input type="number" id="fixed" value="13869" min="0" max="60000" step="100"><span class="hint">$ &middot; agency + influencer</span></div>
+      <div class="field"><label for="rebill">Reorder frequency</label>
+        <input type="number" id="rebill" value="0.55" min="0.05" max="2" step="0.05"><span class="hint">orders each month, per<br>active customer</span></div>
+      <div class="field"><label for="kNow">Lifetime orders, existing base</label>
+        <input type="number" id="kNow" value="2.2" min="1" max="12" step="0.05"><span class="hint">total per customer, for<br>everyone already acquired</span></div>
+      <div class="field"><label for="target">Revenue target / month</label>
+        <input type="number" id="target" value="100000" min="10000" max="500000" step="5000"><span class="hint">$ &middot; Annie's goal</span></div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:16px">
+    <div class="panel-head">
+      <span class="eyebrow">Three routes</span>
+      <h2>Retention buys the right to choose between speed and profit.</h2>
+      <p>Each route sets two levers: <strong>lifetime orders per customer</strong> for everyone acquired from here on, and how fast the budget climbs each month. Lifetime orders divided by the reorder frequency above is how long a customer stays active, shown on every card. Watch what happens to the money, not just the date.</p>
+    </div>
+    <div class="scen-grid" id="scenGrid"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <span class="eyebrow">Monthly revenue from September 2026</span>
+      <h2>The race to $100K</h2>
+      <p>Each line stops the month it crosses the target. Hover anywhere for the month-by-month read, or open the table below for the full 24 months.</p>
+    </div>
+    <div class="legend" id="legend"></div>
+    <div class="chart-shell" id="trajShell">
+      <svg class="chart" id="traj" viewBox="0 0 840 400" role="img" aria-label="Monthly revenue for three routes, each line ending the month it crosses the hundred thousand dollar target"></svg>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+    <details class="tbl">
+      <summary>Show the numbers as a table</summary>
+      <div class="tbl-scroll"><table id="dataTable"></table></div>
+    </details>
+  </section>
+
+  <section class="solve">
+    <div class="solve-fig">
+      <span class="v num" id="breakevenK">4.6</span>
+      <span class="l">Break-even k</span>
+    </div>
+    <div class="solve-body">
+      <p>At the target, this is the lifetime orders per customer at which <strong>gross profit exactly covers all marketing</strong>, including the fixed $13,869. Pouch sits at roughly <strong>2.2</strong> today. Their own subscriber math claims <strong>8</strong>. The entire question is what share of the base behaves like a subscriber.</p>
+      <p>That figure assumes a settled business. While the budget is climbing, the repeat base lags behind the spend that created it, so the real requirement is higher. Each route shows its own ramp-adjusted break-even underneath the k slider, and the gap between the two numbers is the price of growing fast.</p>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <span class="eyebrow">Share of orders, 24 months</span>
+      <h2>Why k compounds and spend does not</h2>
+      <p>The pale band is first orders, bought with media every single month. The colored band is repeat orders from customers already paid for. Shown as a share so the three routes compare directly.</p>
+    </div>
+    <div class="sm-grid" id="smGrid"></div>
+    <div class="legend">
+      <span class="lg"><span class="blk" style="background:var(--neutral-mark)"></span>First orders, paid for again every month</span>
+      <span class="lg"><span class="blk" style="background:var(--s1)"></span>Repeat orders, already paid for</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <span class="eyebrow">Provenance</span>
+      <h2>Where every number comes from</h2>
+    </div>
+    <div class="assump">
+      <div class="arow"><span class="a-k">Starting paid spend<span class="a-s">Northbeam, August 2026</span></span><span class="a-v">$15,275</span></div>
+      <div class="arow"><span class="a-k">Baseline orders<span class="a-s">August: 141 new, 140 returning</span></span><span class="a-v">281</span></div>
+      <div class="arow"><span class="a-k">Average order value<span class="a-s">Aug blended; new $89.50, returning $96.77</span></span><span class="a-v">$93</span></div>
+      <div class="arow"><span class="a-k">Blended CAC<span class="a-s">Pouch planning figure, Sept 4 methodology</span></span><span class="a-v">$115</span></div>
+      <div class="arow"><span class="a-k">Gross profit per order<span class="a-s">Non-sub GP/order, Pouch CAC methodology doc</span></span><span class="a-v">$37.76</span></div>
+      <div class="arow"><span class="a-k">Fixed marketing cost<span class="a-s">$12,000 agency + production, $1,869 influencer</span></span><span class="a-v">$13,869</span></div>
+      <div class="arow"><span class="a-k">Reorder frequency<span class="a-s">Recharge rebill rate, Sept 4 methodology</span></span><span class="a-v">0.55 /mo</span></div>
+      <div class="arow"><span class="a-k">Prior cohorts<span class="a-s">Seeded with real Jan&ndash;Aug 2026 monthly spend, held at today's behaviour</span></span><span class="a-v">8 months</span></div>
+    </div>
+    <p style="font-size:13px;color:var(--ink-2);border-top:1px solid var(--rule);padding-top:14px">
+      <strong style="color:var(--ink)">Calibration check.</strong> Held at August's spend with k at 2.2, the model returns 275 orders and $25,539 against August actuals of 281 orders and $26,186. Run at August's realised CAC of $108 rather than the $115 planning figure, it returns 292 orders. The engine reproduces the month it was built from inside 4%, without any fitted constants.
+    </p>
+  </section>
+
+  <section class="panel caveats">
+    <div class="panel-head">
+      <span class="eyebrow">Read this before quoting anything</span>
+      <h2>What this draft does not yet do</h2>
+    </div>
+    <ul>
+      <li><strong>CAC is unsettled.</strong> The $115 here is paid media over all new customers, per the September methodology. Pouch's own scorecard divides <em>loaded</em> marketing cost by paid conversions and reads about $150 for August. One definition has to be agreed before any output on this page is quotable.</li>
+      <li><strong>Powder is not modeled separately.</strong> The Q1 launch changes AOV, CAC and k. Because the engine runs on those three inputs rather than on a product, powder is a new set of values rather than a rebuild. It needs a confirmed launch date and day-one inventory first.</li>
+      <li><strong>Better retention only applies to customers acquired from here on.</strong> Everyone already on the books keeps today's behaviour, which is why all three routes start at the same place and separate over time. Reactivating lapsed customers is upside this model does not count.</li>
+      <li><strong>k is one blended number here.</strong> The real structure is a subscriber cohort near 8 orders and a single-purchase cohort near 1.5, mixed by attach rate. Version two should split them so attach rate and hold rate become the visible levers instead of k.</li>
+      <li><strong>Organic sits inside the CAC denominator</strong>, following Pouch's stated method. Worth noting their own working file puts paid at 75% of sales while Kuma has been working from roughly 45%, which materially changes the spend any target implies.</li>
+      <li><strong>No seasonality and no competitive response.</strong> BFCM, powder category crowding and CPM inflation are all flat in this draft.</li>
+    </ul>
+  </section>
+
+  <footer>
+    <span>Pouch Growth Model &middot; working draft for discussion, not a commitment</span>
+    <span>Built on data through 10 September 2026</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var MONTHS = 24, BACK = 40;
+  // Actual Pouch paid media by month, Jan - Aug 2026 (Northbeam). Month 0 of the model is Sep 2026.
+  var HIST = [1923.07, 7280.63, 17945.95, 16494.48, 13122.34, 12489.16, 14771.82, 15275.47];
+
+  var SCEN = [
+    {id:"a", name:"Buy It", color:"var(--s1)", k:2.20, g:12,
+     sub:"Customer behaviour stays exactly where it is. Budget does all the work."},
+    {id:"b", name:"Push", color:"var(--s2)", k:6.00, g:12,
+     sub:"Retention fixed, budget still climbing hard. The fastest route there."},
+    {id:"c", name:"Compound", color:"var(--s3)", k:6.00, g:5,
+     sub:"Same retention, a disciplined ramp. Slower, and the only one that earns."}
+  ];
+  var DEFAULTS = {spend0:15275, cac:115, aov:93, gp:37.76, fixed:13869, rebill:0.55, kNow:2.20, target:100000};
+  var DEF_K = {a:2.20, b:6.00, c:6.00}, DEF_G = {a:12, b:12, c:5};
+  var state = {a:{k:2.20,g:12}, b:{k:6.00,g:12}, c:{k:6.00,g:5}};
+
+  var $ = function(id){ return document.getElementById(id); };
+  var FIELDS = ["spend0","cac","aov","gp","fixed","rebill","kNow","target"];
+
+  function cfg(){
+    var c = {};
+    FIELDS.forEach(function(k){
+      var v = parseFloat($(k).value);
+      c[k] = (isFinite(v) && v > 0) ? v : DEFAULTS[k];
+    });
+    return c;
+  }
+
+  var MN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function monthLabel(i){
+    var t = 8 + i;                       // model month 0 = Sep 2026 (index 8)
+    return MN[t % 12] + " " + (26 + Math.floor(t / 12));
+  }
+
+  // ---- engine ----
+  function newCustAt(j, g, c){
+    if (j >= 0) return (c.spend0 * Math.pow(1 + g / 100, j)) / c.cac;
+    var idx = HIST.length + j;           // j = -1 -> Aug 2026
+    return idx >= 0 ? HIST[idx] / c.cac : 0;
+  }
+
+  // orders a single customer still places at age `a` months, for a cohort whose lifetime total is k
+  function schedule(k, rebill){
+    var L = Math.max(0, (k - 1) / rebill);
+    var full = Math.floor(L);
+    return {full:full, tail:(k - 1) - full * rebill, rebill:rebill};
+  }
+  function weightAt(sch, a){
+    if (a <= sch.full) return sch.rebill;
+    if (a === sch.full + 1) return Math.max(0, sch.tail);
+    return 0;
+  }
+
+  function run(k, g, c){
+    var schNew = schedule(k, c.rebill);        // customers acquired from here on
+    var schOld = schedule(c.kNow, c.rebill);   // customers already on the books
+    var rows = [], hit = -1;
+    for (var m = 0; m < MONTHS; m++){
+      var spend = c.spend0 * Math.pow(1 + g / 100, m);
+      var nc = spend / c.cac;
+      var rep = 0;
+      for (var a = 1; a <= BACK; a++){
+        var j = m - a;
+        var w = weightAt(j >= 0 ? schNew : schOld, a);
+        if (w > 0) rep += newCustAt(j, g, c) * w;
+      }
+      var orders = nc + rep;
+      var loaded = spend + c.fixed;
+      var grossp = orders * c.gp;
+      rows.push({
+        m:m, spend:spend, newCust:nc, repeat:rep, orders:orders,
+        rev:orders * c.aov, loaded:loaded, gp:grossp,
+        left:grossp - loaded, eff: loaded > 0 ? grossp / loaded : 0
+      });
+      if (hit < 0 && orders * c.aov >= c.target) hit = m;
+    }
+    return {rows:rows, hit:hit, k:k, g:g};
+  }
+
+  // steady-state k where gross profit exactly covers all marketing at the target
+  function breakevenK(c){
+    var orders = c.target / c.aov;
+    var allowed = orders * c.gp - c.fixed;
+    if (allowed <= 0) return Infinity;
+    return orders / (allowed / c.cac);
+  }
+
+  // lowest k that still leaves money on the table in the month the target is hit, at this ramp
+  function rampBreakevenK(g, c){
+    for (var k = 1.5; k <= 15.001; k += 0.1){
+      var r = run(k, g, c);
+      if (r.hit >= 0 && r.rows[r.hit].left >= 0) return k;
+    }
+    return Infinity;
+  }
+
+  // ---- formatting ----
+  function usd(n){
+    if (!isFinite(n)) return "n/a";
+    return (n < 0 ? "-$" : "$") + Math.round(Math.abs(n)).toLocaleString("en-US");
+  }
+  function usdK(n){ return "$" + Math.round(n / 1000) + "K"; }
+  function num0(n){ return Math.round(n).toLocaleString("en-US"); }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(ch){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[ch]; }); }
+
+  // ---- scenario cards ----
+  function renderScenarios(c, results){
+    $("scenGrid").innerHTML = SCEN.map(function(s, i){
+      var r = results[i];
+      var a = r.hit >= 0 ? r.rows[r.hit] : null;
+      var rbk = rampBreakevenK(s.g, c);
+      var months = (s.k - 1) / c.rebill;
+      var lifespan = months < 1 ? "under a month"
+                   : (months < 24 ? months.toFixed(1) + " months" : (months / 12).toFixed(1) + " years");
+      var cls, glyph, text;
+      if (!a){
+        cls = "v-bad"; glyph = "×";
+        text = "Does not reach the target inside 24 months at this ramp.";
+      } else if (a.left < -2000){
+        cls = "v-bad"; glyph = "▼";
+        text = "Gets there and loses " + usd(Math.abs(a.left)) + " a month doing it. Gross profit covers " + Math.round(a.eff * 100) + "% of marketing.";
+      } else if (a.left < 2000){
+        cls = "v-warn"; glyph = "≈";
+        text = "Gets there at roughly marketing break-even, " + Math.round(a.eff * 100) + "% coverage, with nothing left for overhead.";
+      } else {
+        cls = "v-good"; glyph = "▲";
+        text = "Gets there with " + usd(a.left) + " a month left after all marketing, " + Math.round(a.eff * 100) + "% coverage.";
+      }
+      return '<article class="scen">' +
+        '<div class="scen-top">' +
+          '<div class="scen-tag"><span class="swatch" style="background:' + s.color + '"></span>' +
+          '<span class="scen-name">' + esc(s.name) + '</span></div>' +
+          '<span class="scen-sub">' + esc(s.sub) + '</span></div>' +
+
+        '<div class="lever">' +
+          '<div class="lv-row"><span class="lv-label">Lifetime orders per customer</span>' +
+          '<span class="lv-val" style="color:' + s.color + '">' + s.k.toFixed(2) + '</span></div>' +
+          '<input type="range" id="k-' + s.id + '" min="1.5" max="9" step="0.05" value="' + s.k + '" ' +
+          'aria-label="Lifetime orders per customer, ' + esc(s.name) + '">' +
+          '<div class="lv-foot"><span>1.5</span><span>needs ' + (isFinite(rbk) ? rbk.toFixed(1) : "&gt;15") + ' to earn at this ramp</span><span>9.0</span></div>' +
+        '</div>' +
+
+        '<div class="lever">' +
+          '<div class="lv-row"><span class="lv-label">Budget increase each month</span>' +
+          '<span class="lv-val" style="color:' + s.color + '">' + s.g + '%</span></div>' +
+          '<input type="range" id="g-' + s.id + '" min="0" max="20" step="1" value="' + s.g + '" ' +
+          'aria-label="Monthly budget increase, ' + esc(s.name) + '">' +
+          '<div class="lv-foot"><span>0%</span><span>client rule: 10&ndash;15%</span><span>20%</span></div>' +
+        '</div>' +
+
+        '<div class="stats">' +
+          '<div class="stat"><span class="stat-k">Target reached</span><span class="stat-v">' +
+            (a ? "Month " + (r.hit + 1) + " · " + monthLabel(r.hit) : "Not in 24 mo") + '</span></div>' +
+          '<div class="stat"><span class="stat-k">Paid spend that month</span><span class="stat-v">' + (a ? usd(a.spend) : "n/a") + '</span></div>' +
+          '<div class="stat"><span class="stat-k">All-in marketing</span><span class="stat-v">' + (a ? usd(a.loaded) : "n/a") + '</span></div>' +
+          '<div class="stat"><span class="stat-k">Gross profit</span><span class="stat-v">' + (a ? usd(a.gp) : "n/a") + '</span></div>' +
+          '<div class="stat"><span class="stat-k">Left after marketing</span><span class="stat-v" style="color:' +
+            (a ? (a.left >= 0 ? "var(--good)" : "var(--bad)") : "inherit") + '">' + (a ? usd(a.left) : "n/a") + '</span></div>' +
+          '<div class="stat"><span class="stat-k">New customers / month</span><span class="stat-v">' + (a ? num0(a.newCust) : "n/a") + '</span></div>' +
+          '<div class="stat"><span class="stat-k">Implied customer lifespan</span><span class="stat-v">' + lifespan + '</span></div>' +
+        '</div>' +
+
+        '<div class="verdict ' + cls + '"><span class="glyph">' + glyph + '</span><span>' + esc(text) + '</span></div>' +
+      '</article>';
+    }).join("");
+
+    SCEN.forEach(function(s){
+      $("k-" + s.id).addEventListener("input", function(e){
+        state[s.id].k = parseFloat(e.target.value); update();
+      });
+      $("g-" + s.id).addEventListener("input", function(e){
+        state[s.id].g = parseFloat(e.target.value); update();
+      });
+    });
+  }
+
+  // ---- trajectory ----
+  var W = 840, H = 400, PL = 66, PR = 104, PT = 20, PB = 46;
+  var plotW = W - PL - PR, plotH = H - PT - PB;
+  var geom = null;
+
+  function renderTraj(c, results){
+    // Horizon: a little past the last crossing, so the race to the target fills the frame.
+    var lastHit = -1;
+    results.forEach(function(r){ if (r.hit > lastHit) lastHit = r.hit; });
+    var anyMiss = results.some(function(r){ return r.hit < 0; });
+    var H_END = anyMiss ? MONTHS : Math.min(MONTHS, Math.max(9, lastHit + 3));
+
+    // Each series is drawn only until it crosses. After that it is no longer the question.
+    function endOf(r){ return r.hit >= 0 ? Math.min(r.hit, H_END - 1) : H_END - 1; }
+
+    var maxRev = c.target * 1.18;
+    results.forEach(function(r){
+      for (var i = 0; i <= endOf(r); i++){ if (r.rows[i].rev > maxRev) maxRev = r.rows[i].rev; }
+    });
+    var step = maxRev > 400000 ? 100000 : maxRev > 240000 ? 50000 : maxRev > 120000 ? 25000 : 20000;
+    var top = Math.ceil(maxRev / step) * step;
+
+    function X(i){ return PL + (i / (H_END - 1)) * plotW; }
+    function Y(v){ return PT + plotH - (Math.min(v, top) / top) * plotH; }
+    geom = {X:X, Y:Y, H_END:H_END};
+
+    var p = [];
+    for (var v = 0; v <= top; v += step){
+      p.push('<line class="gridline" x1="' + PL + '" y1="' + Y(v).toFixed(1) + '" x2="' + (PL + plotW) + '" y2="' + Y(v).toFixed(1) + '"></line>');
+      p.push('<text class="axis-text" x="' + (PL - 12) + '" y="' + (Y(v) + 4).toFixed(1) + '" text-anchor="end">' + (v === 0 ? "0" : usdK(v)) + '</text>');
+    }
+    p.push('<line class="target-line" x1="' + PL + '" y1="' + Y(c.target).toFixed(1) + '" x2="' + (PL + plotW) + '" y2="' + Y(c.target).toFixed(1) + '"></line>');
+    p.push('<text class="axis-text strong" x="' + (PL + plotW + 8) + '" y="' + (Y(c.target) - 7).toFixed(1) + '">Target</text>');
+    p.push('<text class="axis-text strong" x="' + (PL + plotW + 8) + '" y="' + (Y(c.target) + 7).toFixed(1) + '">' + usdK(c.target) + '</text>');
+
+    var xStep = H_END > 18 ? 4 : H_END > 12 ? 3 : 2;
+    for (var i = 0; i < H_END; i += xStep){
+      p.push('<text class="axis-text" x="' + X(i).toFixed(1) + '" y="' + (PT + plotH + 22) + '" text-anchor="middle">' + monthLabel(i) + '</text>');
+    }
+
+    var labels = [];
+    results.forEach(function(r, idx){
+      var s2 = SCEN[idx], e = endOf(r);
+      var pts = [];
+      for (var i = 0; i <= e; i++) pts.push(X(i).toFixed(1) + "," + Y(r.rows[i].rev).toFixed(1));
+      p.push('<polyline class="serie" points="' + pts.join(" ") + '" style="stroke:' + s2.color + '"></polyline>');
+      if (r.hit >= 0 && r.hit <= H_END - 1){
+        p.push('<circle class="dot-ring" cx="' + X(r.hit).toFixed(1) + '" cy="' + Y(r.rows[r.hit].rev).toFixed(1) + '" r="5.5" style="fill:' + s2.color + '"></circle>');
+        labels.push({idx:idx, x:X(r.hit), y:Y(r.rows[r.hit].rev) - 16,
+                     t:s2.name + " \u00b7 " + monthLabel(r.hit)});
+      } else {
+        labels.push({idx:idx, x:X(e), y:Y(r.rows[e].rev) - 16, t:s2.name + " \u00b7 not yet"});
+      }
+    });
+
+    // lift labels that sit too close together horizontally
+    labels.sort(function(a, b){ return a.x - b.x; });
+    for (var l = 1; l < labels.length; l++){
+      if (Math.abs(labels[l].x - labels[l - 1].x) < 130 &&
+          Math.abs(labels[l].y - labels[l - 1].y) < 17){
+        labels[l].y = labels[l - 1].y - 17;
+      }
+    }
+    labels.forEach(function(lb){
+      var anchor = lb.x > PL + plotW - 90 ? "end" : "middle";
+      p.push('<text class="dlabel" x="' + lb.x.toFixed(1) + '" y="' + lb.y.toFixed(1) +
+             '" text-anchor="' + anchor + '" style="fill:' + SCEN[lb.idx].color + '">' + esc(lb.t) + '</text>');
+    });
+
+    p.push('<line class="crosshair" id="xh" x1="0" y1="' + PT + '" x2="0" y2="' + (PT + plotH) + '" style="opacity:0"></line>');
+    results.forEach(function(_, idx){
+      p.push('<circle class="dot-ring" id="hd' + idx + '" r="4.5" cx="-99" cy="-99" style="fill:' + SCEN[idx].color + ';opacity:0"></circle>');
+    });
+    p.push('<rect id="hit" x="' + PL + '" y="' + PT + '" width="' + plotW + '" height="' + plotH + '" fill="transparent" style="cursor:crosshair"></rect>');
+
+    $("traj").innerHTML = p.join("");
+    attachHover(results);
+  }
+
+  function attachHover(results){
+    var svg = $("traj"), tip = $("tip"), hit = $("hit");
+    if (!hit) return;
+    function show(pt){
+      var rect = svg.getBoundingClientRect();
+      var xs = (pt.clientX - rect.left) * (W / rect.width);
+      var N = geom.H_END;
+      var i = Math.max(0, Math.min(N - 1, Math.round(((xs - PL) / plotW) * (N - 1))));
+      var xh = $("xh");
+      if (xh){ xh.setAttribute("x1", geom.X(i)); xh.setAttribute("x2", geom.X(i)); xh.style.opacity = "1"; }
+      results.forEach(function(r, k){
+        var d = $("hd" + k);
+        if (!d) return;
+        d.setAttribute("cx", geom.X(i));
+        d.setAttribute("cy", geom.Y(r.rows[i].rev));
+        d.style.opacity = "1";
+      });
+      tip.innerHTML = '<div class="tip-title">' + monthLabel(i) + '</div>' +
+        results.map(function(r, k){
+          var d = r.rows[i];
+          return '<div class="tip-row"><span class="swatch" style="background:' + SCEN[k].color + '"></span>' +
+                 '<span class="nm">' + esc(SCEN[k].name) + '</span>' +
+                 '<span class="sp">' + usdK(d.spend) + ' in</span>' +
+                 '<span class="vl">' + usd(d.rev) + '</span></div>';
+        }).join("");
+      tip.hidden = false;
+      var px = (geom.X(i) / W) * rect.width;
+      var py = (geom.Y(results[0].rows[i].rev) / H) * rect.height;
+      tip.style.left = Math.max(110, Math.min(rect.width - 110, px)) + "px";
+      tip.style.top = Math.max(70, py) + "px";
+    }
+    function hide(){
+      tip.hidden = true;
+      var xh = $("xh"); if (xh) xh.style.opacity = "0";
+      results.forEach(function(_, k){ var d = $("hd" + k); if (d) d.style.opacity = "0"; });
+    }
+    hit.addEventListener("mousemove", show);
+    hit.addEventListener("mouseleave", hide);
+    hit.addEventListener("touchstart", function(e){ show(e.touches[0]); }, {passive:true});
+    hit.addEventListener("touchmove", function(e){ show(e.touches[0]); }, {passive:true});
+    hit.addEventListener("touchend", hide);
+  }
+
+  function renderLegend(c){
+    $("legend").innerHTML = SCEN.map(function(s){
+      return '<span class="lg"><span class="bar" style="background:' + s.color + '"></span>' + esc(s.name) +
+             ' <span class="num" style="color:var(--ink-3)">k ' + s.k.toFixed(2) + ' &middot; +' + s.g + '%/mo</span></span>';
+    }).join("") + '<span class="lg"><span class="dash"></span>Target ' + usdK(c.target) + '</span>';
+  }
+
+  // ---- small multiples ----
+  function renderSmall(c, results){
+    var w = 280, h = 168, pl = 42, pr = 8, pt = 10, pb = 26;
+    var pw = w - pl - pr, ph = h - pt - pb;
+
+    $("smGrid").innerHTML = SCEN.map(function(s2, idx){
+      var r = results[idx];
+      function X(i){ return pl + (i / (MONTHS - 1)) * pw; }
+      function Y(pctv){ return pt + ph - (pctv / 100) * ph; }   // share of orders, 0-100
+
+      var share = r.rows.map(function(d){ return d.orders > 0 ? (d.newCust / d.orders) * 100 : 100; });
+
+      var newTop = share.map(function(v, i){ return X(i).toFixed(1) + "," + Y(v).toFixed(1); });
+      var newArea = "M" + X(0).toFixed(1) + "," + Y(0).toFixed(1) + " L" + newTop.join(" L") +
+                    " L" + X(MONTHS - 1).toFixed(1) + "," + Y(0).toFixed(1) + " Z";
+      var repBot = share.map(function(v, i){ return X(i).toFixed(1) + "," + (Y(v) - 2).toFixed(1); }).reverse();
+      var repArea = "M" + X(0).toFixed(1) + "," + Y(100).toFixed(1) +
+                    " L" + X(MONTHS - 1).toFixed(1) + "," + Y(100).toFixed(1) +
+                    " L" + repBot.join(" L") + " Z";
+
+      var p = [];
+      [0, 50, 100].forEach(function(v){
+        p.push('<line class="gridline" x1="' + pl + '" y1="' + Y(v).toFixed(1) + '" x2="' + (pl + pw) + '" y2="' + Y(v).toFixed(1) + '"></line>');
+        p.push('<text class="axis-text" x="' + (pl - 8) + '" y="' + (Y(v) + 4).toFixed(1) + '" text-anchor="end" style="font-size:10px">' + v + '%</text>');
+      });
+      p.push('<path d="' + newArea + '" fill="var(--neutral-mark)" opacity="0.6"></path>');
+      p.push('<path d="' + repArea + '" fill="' + s2.color + '" opacity="0.92"></path>');
+      p.push('<text class="axis-text" x="' + pl + '" y="' + (pt + ph + 18) + '" style="font-size:10px">' + monthLabel(0) + '</text>');
+      p.push('<text class="axis-text" x="' + (pl + pw) + '" y="' + (pt + ph + 18) + '" text-anchor="end" style="font-size:10px">' + monthLabel(MONTHS - 1) + '</text>');
+
+      var last = r.rows[MONTHS - 1];
+      var pct = Math.round((last.repeat / last.orders) * 100);
+      var now = Math.round((r.rows[0].repeat / r.rows[0].orders) * 100);
+      return '<div class="sm">' +
+        '<h3 style="color:' + s2.color + '">' + esc(s2.name) + '</h3>' +
+        '<p class="sm-cap">Repeat share goes from <span class="num">' + now + '%</span> to <span class="num">' + pct + '%</span> of all orders.</p>' +
+        '<svg class="chart" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="Share of orders that are repeat versus first, ' +
+        esc(s2.name) + '. Repeat share moves from ' + now + ' percent to ' + pct + ' percent over 24 months.">' + p.join("") + '</svg></div>';
+    }).join("");
+  }
+
+  // ---- table ----
+  function renderTable(results){
+    var head = '<thead><tr><th></th>' +
+      SCEN.map(function(s){ return '<th class="grp" colspan="2">' + esc(s.name) + '</th>'; }).join("") +
+      '</tr><tr><th>Month</th>' +
+      SCEN.map(function(){ return '<th>Revenue</th><th>After mktg</th>'; }).join("") + '</tr></thead>';
+    var body = "<tbody>";
+    for (var i = 0; i < MONTHS; i++){
+      var isHit = results.some(function(r){ return r.hit === i; });
+      body += '<tr class="' + (isHit ? "hit" : "") + '"><td>' + monthLabel(i) + '</td>' +
+        results.map(function(r){
+          return '<td>' + usd(r.rows[i].rev) + '</td><td>' + usd(r.rows[i].left) + '</td>';
+        }).join("") + '</tr>';
+    }
+    $("dataTable").innerHTML = head + body + "</tbody>";
+  }
+
+  function renderProof(c){
+    $("proofSpend").textContent = usd((c.target / c.aov) * c.cac);
+    var bk = breakevenK(c);
+    $("breakevenK").textContent = isFinite(bk) ? bk.toFixed(1) : "n/a";
+  }
+
+  function update(){
+    var c = cfg();
+    SCEN.forEach(function(s){ s.k = state[s.id].k; s.g = state[s.id].g; });
+    var results = SCEN.map(function(s){ return run(s.k, s.g, c); });
+    renderProof(c);
+    renderScenarios(c, results);
+    renderLegend(c);
+    renderTraj(c, results);
+    renderSmall(c, results);
+    renderTable(results);
+  }
+
+  FIELDS.forEach(function(k){ $(k).addEventListener("input", update); });
+  $("resetBtn").addEventListener("click", function(){
+    FIELDS.forEach(function(k){ $(k).value = DEFAULTS[k]; });
+    SCEN.forEach(function(s){ state[s.id] = {k:DEF_K[s.id], g:DEF_G[s.id]}; });
+    update();
+  });
+  window.addEventListener("resize", function(){ $("tip").hidden = true; });
+
+  update();
+})();
+</script>
+</body>
+</html>
